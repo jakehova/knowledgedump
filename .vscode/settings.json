@@ -17,5 +17,22 @@
     "**/node_modules": true
   },
   "vscodeMarkdownNotes.noteCompletionConvention": "noExtension",
-  "vscodeMarkdownNotes.slugifyMethod": "github-slugger"
+  "vscodeMarkdownNotes.slugifyMethod": "github-slugger",
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#ef7a33",
+    "activityBar.activeBorder": "#097632",
+    "activityBar.background": "#ef7a33",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#097632",
+    "activityBarBadge.foreground": "#e7e7e7",
+    "statusBar.background": "#de5e11",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#ef7a33",
+    "titleBar.activeBackground": "#de5e11",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#de5e1199",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "#de5e11"
 }
