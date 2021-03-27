@@ -1,4 +1,4 @@
-# Feynman
+# Feynman Technique
 
 * Pretend to teach a concept you want to learn about to a student in the sixth grade.
     * Write the subject at the top of the page
