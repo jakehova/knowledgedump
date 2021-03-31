@@ -100,9 +100,50 @@ return          // pop and return respective true/false
 
 **Notes**
 * [Resolving issue with running tealdbg in windows](https://github.com/algorand/go-algorand/issues/1809) and [another resolution](https://github.com/algorand/go-algorand/pull/1977)
+* You cant get the current time, but you can get the last block creation time which should bring you within a few seconds by addressing the global LatestTimestamp
+  * Format is in Unix timestamp (seconds since 1/1/1970): 
+
+| Human Readable Time | seconds |
+| --- | --- |
+| 1 Hour | 3600 Seconds | 
+| 1 Day | 86400 Seconds |
+| 1 Week | 604800 Seconds | 
+| 1 Month | 2629743 |
+| 1 Year | 31556926 Seconds |
+
+
+**Installing on Windows**
+* [Configure Windows Environment](https://developer.algorand.org/tutorials/compile-and-run-the-algorand-node-natively-windows/)
+* [Download MSYS2](https://www.msys2.org/)
+  * Install and Configure msys2:
+    * Update package database and base packages: pacman -Syu
+    * Update the rest of the packages: pacman -Su
+    * Install base dev packages: pacman -S --needed base-devel 
+    * install gcc and make: pacman -S --needed mingw-w64-x86_64-toolchain
+    * install Git: pacman -S --disable-download-timeout --noconfirm git 
+      * Installs in the msys64/usr/bin directory
+    * install go: pacman -S --disable-download-timeout --noconfirm mingw-w64-x86_64-go 
+    * install gcc: pacman -S gcc vim make    
+    * install golint: go get -u golang.org/x/lint/golint
+    * install stringer: go get -u golang.org/x/tools/cmd/stringer
+    * install swagger: go get -u github.com/go-swagger/go-swagger github.com/go-swagger/go-swagger/cmd/swagger
+    * install msgp: go get -u github.com/algorand/msgp
+    * instal sqlite3: pacman -S sqlite3
+  * Exit from the msys terminal and then re-open it. 
+  * Update the $HOME/User/.bashrc file by appending to the end: 
+    * path to the go exe: export PATH="/mingw64/lib/go/bin":$PATH
+    * the path to go output: export GOPATH=$HOME/go
+  * Exit from the msys terminal and then re-open it
+  * Clone the go-algorand git repo: git clone https://github.com/algorand/go-algorand
+    * install required libraries for algo(./scripts/configure_dev.sh -f): pacman -S --disable-download-timeout --noconfirm git automake autoconf m4 libtool make mingw-w64-x86_64-gcc mingw-w64-x86_64-boost mingw-w64-x86_64-python mingw-w64-x86_64-jq unzip procps
+    * install dependencies for the algo libraries 
+      * ./scripts/configure_dev-deps.sh
+  * Run make: make
+  * 
 
 **Debugging**
 * [Debugging](https://developer.algorand.org/docs/features/asc1/debugging/)
+
 * Ways to debug: 
   * tealdbg
     * command line tool to launch a debug session 
@@ -111,3 +152,4 @@ return          // pop and return respective true/false
       * 
   * goal clerk dryrun-remote
     * Ouputs a line by line result of the evaluation of the smart contract
+

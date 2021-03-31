@@ -1,5 +1,6 @@
 # Feynman Technique
 
+* [Technique](https://fs.blog/2021/02/feynman-learning-technique/)
 * Pretend to teach a concept you want to learn about to a student in the sixth grade.
     * Write the subject at the top of the page
     * Write out everything you know about the topic as if explaining it to a child (focus on short attention span and no-special-term vocabulary)
