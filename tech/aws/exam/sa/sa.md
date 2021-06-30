@@ -1,0 +1,12 @@
+# Solution Architect Exam Notes
+
+- A region is a physical location in the world that consists of 2 or more AZs
+- An AZ is one more discrete data center house in separte facilities each with redundant power, netowrking, and connectivity
+- AN Edge Lcoation endpoints for AWS used for caching content.  Usually consists of CloudFront.
+- (Well Architected Framework)[https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html?did=wp_card&trk=wp_card]
+- Shared Responsibility Model - You are responsible for Security IN the cloud (customer data, authorization/authentication, encryption, etc) and AWS is responsible for Security OF the cloud (hardware, software)
+- Key Services to Know: 
+    - Compute: EC2, Lambda, Elastic Beanstalk
+    - Networking: VPC, Direct Connect, Route 53, API Gateway, AWS Global Accelerator
+    - Storage: S3, EBS (Elastic Block Store), EFS (Elastic File Service), FSx, Storage Gateway
+    - Databases: RDS, DynamoDB, Redshift 

@@ -24,7 +24,8 @@
   * switch to that directory: cd go-algorand
   * run the configure dev shell script: ./scripts/configure_dev.sh
   * build the go-algorand project: make
-* Install the Node
+
+**Install the Node**
   * create a directory off the C drive: mkdir c:\AlgorandNode
   * change into that directory: cd c:\AlgorandNode
   * copy the compiled files from the make to the algorandnode folder: COPY /Y C:\msys64\home\%USERNAME%\go\bin .
@@ -34,15 +35,39 @@
     * This copies the testnet genesis file but you can copy the beta/main by changing "testnet" to "betanet" or "mainnet" respectively
   * copy the example configuration file and rename it config: COPY /Y C:\msys64\home\%USERNAME%\go-algorand\installer\config.json.example config.json
   * edit the config file: 
+    * [Node Config Dictionary](https://developer.algorand.org/docs/reference/node/config/)
     * Update EndpointAddress to have a locally accessible port: 120.0.0.1:8101
       * If you want to be accessble publicy then put just the port: :8101
+      * If you want to be accessible locally but from sources that arent just localhost (i.e. postman): 0.0.0.0:8101
     * Update DNSBootstrapID to match the appropriate testnet network: testnet.algodev.network
     * Update EnableDeveloperAPI value to true
     * If you want to store all the blockchain instead of the latest 1000 blocks, then change Archival to true
       * If storing all, then you need at least 200GB of free space
-* Run the node
+  * configure kmd
+    * in algorand node's <data> folder:
+      * create kmd-<kmd version> folder
+        * in kmd folder create kmd_config.json File
+          * create json object with: 
+            * address: 0.0.0.0:7833
+            * allowed_origins: ""
+            * session_lifetime_secs: 60
+
+**Run the node**
   * Open Powershell and navigate to C:\AlgorandNode
   * Start the node: "./goal node start -d data"
   * Verify the node is running: "./goal node status -d data"
-* Usage
+    * Stop the node: "./goal node stop -d data"
+  * Perform a fast catchup: 
+    * Go to the appropriate link and copy the catchpoint provided
+      * BetaNet https://algorand-catchpoints.s3.us-east-2.amazonaws.com/channel/betanet/latest.catchpoint
+      * TestNet https://algorand-catchpoints.s3.us-east-2.amazonaws.com/channel/testnet/latest.catchpoint
+      * MainNet https://algorand-catchpoints.s3.us-east-2.amazonaws.com/channel/mainnet/latest.catchpoint
+    * Run: ./goal node catchup <Catchpoint value> -d data
+  * Updating a node: ./update.sh -d data
+    * force an update ./update.sh -i -c stable -d data
+
+**Usage**
   * goal, kmd, algokey are all in the AlgorandNode folder
+  * Token to use for api: 
+    * Key: "X-Algo-API-Token"
+    * Value: <Value in C:\ALgorandNode\data\algo.token file>

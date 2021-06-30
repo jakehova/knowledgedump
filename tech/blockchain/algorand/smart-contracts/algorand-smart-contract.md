@@ -3,7 +3,21 @@
 - [[algorand-stateful-contract]] - Stateful Contract
 - [[algorand-stateless-contract]] - Stateless Contract
 
-**What**
+## Feynmann
+**What are contracts?** Imagine that you build a robot that you can put in charge of doing things for you.  You give that robot instructions on how to act when people talk to it.  The robot can listen for people's commands and then make a decision, based on the instructions you gave it, as to whether or not to listen to the command thats given.  
+
+**What are contracts used for?** Instead of a person having to sit at their computer and verify commands on their own, they offload that responsibility to the robot.  So if someone commands, I'll pay you $20 for that baseball card, the robot can make a decision to say yes or no to that.  They make that decision based on the code you give it.  
+
+## Notes
+* Arguments vs Parameters
+  * Parameters are chosen when creating the smart contract
+  * Arguments are chosen when executing the smart contract
+* Contracts are Algo Accounts that are run by logic that is written in TEAL.  
+* There are two types: Stateful and Stateless
+  * The difference between the two is that stateful have the ability to store state and stateless dont (biiiggg Duh)
+  * Stateful contracts have the ability to store state in any account that is interacting with the contract (local storage) AND/OR store state "in itself" (global state).
+
+## What
 * Smart Contracts are small programs that operate on layer-1
 * Two main categories are stateful and stateless
 * Written in Transaction Execution Approval Language (TEAL - https://developer.algorand.org/docs/features/asc1/teal/)
@@ -16,6 +30,9 @@
    *  Algorand ASAs
    *  grouped transaction properties
 *  [Examples](https://github.com/algorand/smart-contracts/tree/master/devrel/demo)
+
+**CodeSample**
+
 
 **Differences between Stateless and Stateful Contracts**
 | Metric | Stateful | Stateless |

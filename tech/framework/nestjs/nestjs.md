@@ -25,6 +25,7 @@
       *  T is optional but specifies HTTP framework to use: 
          *  Express: NestExpressApplication
          *  Fastify: NestFastifyApplication
+
 * Controller
   * Handles requests and responses
   * Decorators tie required metadata to controller methods so that Nest can generate a routing map
@@ -59,10 +60,10 @@
           * Can add the "@Res()" or "@Next", depending on framework (Express or Fastify) decorator on a parameter in the method's parameter list to denote overriden response handling.
             * In the method, you would use the parameter that is decorated like that respective framework handles responses. 
               * ex: @Get() findAll(@Res() response) { response.status(200).send();}
-        * request:
-          * @Req() decorator on parameter in parameter list holds the full request
-          * @Body() decorator on parameter in parameter list holds the request body
-          * @Query() decorator on parameter in parameter list holds the query string
+      * request:
+        * @Req() decorator on parameter in parameter list holds the full request
+        * @Body() decorator on parameter in parameter list holds the request body
+        * @Query() decorator on parameter in parameter list holds the query string
     * @HttpCode
       * parameters: 
         *  (1) integer that relates to http status code to return 
@@ -84,6 +85,9 @@
   * Express: @nestjs/platform-express
   * Fastify 
   * **Note**: Works with any Node HTTP framework once an adapter is created
+* [Uploading Files](https://docs.nestjs.com/techniques/file-upload)
+  * Nest has a built in module based on multer middleware for Express
+  * Install the types so you can access them: npm i -D @types/multer
 * Scope
   * All resources are shared across incoming requests. 
     * Similar to .net core where you define things as transient, singleton, etc.  Provider types are

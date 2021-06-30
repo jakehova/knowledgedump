@@ -1,0 +1,175 @@
+#pragma version 2
+// 3 args: asset id, min cost, seller address
+global GroupSize
+int 3
+==
+bnz buy
+global GroupSize
+int 4
+==
+bnz sell
+int 0 
+return
+buy:
+// 3 transactions: optin from buyer, pay from buyer to seller for mincost, transfer from contract to buyer
+// verify no transaction contains a rekey
+gtxn 0 RekeyTo
+global ZeroAddress
+==
+gtxn 1 RekeyTo
+global ZeroAddress
+==
+&&
+gtxn 2 RekeyTo
+global ZeroAddress
+==
+&&
+gtxn 0 CloseRemainderTo
+global ZeroAddress
+==
+&& 
+gtxn 1 CloseRemainderTo
+global ZeroAddress
+==
+&& 
+gtxn 2 CloseRemainderTo
+global ZeroAddress
+==
+&& 
+gtxn 0 AssetCloseTo
+global ZeroAddress
+==
+&&
+gtxn 1 AssetCloseTo
+global ZeroAddress  
+==
+&&
+gtxn 2 AssetCloseTo
+global ZeroAddress
+==
+&&
+bz fail
+// optin from buyer, pay from buyer to seller for mincost, transfer from contract to buyer
+gtxn 0 TypeEnum
+int axfer
+== 
+gtxn 1 TypeEnum
+int pay
+==
+&&
+gtxn 2 TypeEnum
+int axfer
+==
+&&
+// types of txns are correct now verify the individual pieces of them
+// verify opt in 
+gtxn 0 Amount
+int 0
+== 
+&&
+gtxn 0 Receiver
+gtxn 0 Sender
+==
+&&
+arg_0
+btoi
+gtxn 0 XferAsset
+==
+&&
+//verify pay
+arg_1
+btoi
+gtxn 1 Amount
+==
+&&
+arg_2
+gtxn 1 Receiver
+==
+&&
+// verify transfer already done in the previous sender 1 Sender 2 Receiver check
+gtxn 1 Sender
+gtxn 2 Receiver
+==
+&&
+bz fail
+int 1 
+return
+sell: 
+// 4 transactions: pay from seller to contract, unfreeze of assetid, optin from contract, transfer of asset id from seller to contract
+// verify no transaction contains a rekey
+gtxn 0 RekeyTo
+global ZeroAddress
+==
+gtxn 1 RekeyTo
+global ZeroAddress
+==
+&&
+gtxn 2 RekeyTo
+global ZeroAddress
+==
+&&
+gtxn 3 RekeyTo
+global ZeroAddress
+==
+&&
+gtxn 0 CloseRemainderTo
+global ZeroAddress
+==
+&& 
+gtxn 1 CloseRemainderTo
+global ZeroAddress
+==
+&& 
+gtxn 2 CloseRemainderTo
+global ZeroAddress
+==
+&& 
+gtxn 3 CloseRemainderTo
+global ZeroAddress
+==
+&& 
+gtxn 0 AssetCloseTo
+global ZeroAddress
+==
+&&
+gtxn 1 AssetCloseTo
+global ZeroAddress  
+==
+&&
+gtxn 2 AssetCloseTo
+global ZeroAddress
+==
+&&
+gtxn 3 AssetCloseTo
+global ZeroAddress
+==
+&&
+bz fail
+// pay from seller to contract, unfreeze of assetid, optin from contract, transfer of asset id from seller to contract
+// verify unfreezing asset 
+gtxn 1 FreezeAssetFrozen
+int 0
+==
+arg_0
+btoi
+int 123
+==
+&&
+// verify opt in from contract
+arg_0
+btoi
+gtxn 2 XferAsset
+==
+&&
+//verify transfer
+arg_0
+btoi
+gtxn 3 XferAsset
+==
+&&
+bz fail
+int 1
+return
+fail:
+int 0
+return

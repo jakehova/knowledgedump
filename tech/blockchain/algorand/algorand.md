@@ -7,12 +7,10 @@
 **What**
 * Blockchain written by a Turing winner
 
-**Setup**
-* [Instructions](https://developer.algorand.org/tutorials/compile-and-run-the-algorand-node-natively-windows/)
-* Run the node
-  * Open Powershell and navigate to C:\AlgorandNode
-  * Start the node: "./goal node start -d data"
-  * Verify the node is running: "./goal node status -d data"
+**Common Links**
+[Algorand Explorer](https://testnet.algoexplorer.io/)
+[Algo Faucet](https://bank.testnet.algorand.network/)
+
 
 **Questions**
 * Why is it different from other blockchains
