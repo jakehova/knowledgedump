@@ -1,26 +1,29 @@
 # Docker Commands
 
-DOCKER:
-Build image
-docker build -t "<NAME OF IMAGE>:Dockerfile" .
+docker pull <image name>: Pull an image down from Docker Hub
 
-Run Image
-docker container run -d 
+docker build -t "<NAME OF IMAGE>:Dockerfile" .: Build image
 
-Start a Container
-docker container start [containerid]
+docker container run: Run Image: 
+    * Parameters: 
+        * -p <port internal to docker container>:<port external that you access the internal port by> => define a port to run on
+        * -d => run the container in the background (detached mode)
 
-Stop a Container
-docker container stop [containerid]
+docker images: List Images
 
-Remove a Container
-docker container rm [containerid]
+docker rmi <first few characters of image id>: Remove Image
 
-Remove all unused docker objects
-docker system|container|image|volume|network prune
+docker ps: List Running Containers
+    * Parameters    
+        * -a => view all containers (not just the ones running)
 
-​​​​​​​​​​​​​​​​​​​​​​​​​​​​docker run -it algorand/testnet
-./goal node start -d data
+docker start [containerid]: Start a Container
 
-vmmem/wsl eating up resources
- - shut down wsl: wsl --shutdown
+docker stop [containerid]: Stop a Container
+
+docker rm [containerid]: Remove a Container
+
+docker system|container|image|volume|network prune: Remove all unused docker objects
+
+docker inspect <container id>: View Properties of a Running Container
+    * Find the Running IP of a running container: docker inspect --format '{{ .NetworkSettings.IPAddress }}' <container id>

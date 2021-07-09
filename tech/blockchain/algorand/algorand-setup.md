@@ -71,3 +71,9 @@
   * Token to use for api: 
     * Key: "X-Algo-API-Token"
     * Value: <Value in C:\ALgorandNode\data\algo.token file>
+
+​​​​​​​​​​​​​​​​​​​​​​​​​​​​docker run -it algorand/testnet
+./goal node start -d data
+
+vmmem/wsl eating up resources
+ - shut down wsl: wsl --shutdown
