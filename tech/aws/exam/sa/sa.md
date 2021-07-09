@@ -10,3 +10,13 @@
     - Networking: VPC, Direct Connect, Route 53, API Gateway, AWS Global Accelerator
     - Storage: S3, EBS (Elastic Block Store), EFS (Elastic File Service), FSx, Storage Gateway
     - Databases: RDS, DynamoDB, Redshift 
+- Securing Root Account: 
+    - Enable MFA
+    - Create an Admin Group for your admins and assign the appropriate permissions to that group
+    - Create user accounts for admins
+    - Add users to the admin group
+- You control access to AWS via IAM which uses Policy Documents (JSON)
+- IAM is global; it does not apply to regions.
+- The root account should be locked down immediately and never used for day to day activities.  Should then create an admin group and add user accounts to that. 
+- Access Key ID and secret Access Keys are not the same as username and passwords; they are for programmatic console access.  They cannot be used to log in to the console.
+- IAM Federation is used to combine your existing user account mgmt platform (usually Active Directory) with AWS via SAML standard (SAML Standard is Active Directory)
