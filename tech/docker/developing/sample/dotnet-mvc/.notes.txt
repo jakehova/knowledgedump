@@ -1,0 +1,11 @@
+Run with local volume and directly from commandline: 
+* created a dotnet core mvc project; dotnet new mvc
+* used a .net core docker image: docker pull mcr.microsoft.com/dotnet/core/sdk
+* updated launchsettings to allow any ip along port 5000: "applicationUrl": "http://+:5000"
+* generate container in interactive mode: docker run -it -p 8080:5000  -v ${pwd}:/app -w "/app" mcr.microsoft.com/dotnet/core/sdk /bin/bash
+* ran dotnet build
+* ran dotnet watch run
+
+**Note** - this dotnet core docker container is invalid and wont build properly.  get the previous version of the container or one that is updated to work
+
+Build an image with it using dockerfile
