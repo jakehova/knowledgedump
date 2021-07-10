@@ -7,4 +7,4 @@
 * Create an env variable: Set-Item -Path Env:<variablename> -Value "<variablevalue>"
     * if <variablevalue> is '' then it deletes the environment variable
     * can also use the shortcut $env:<variablename> = "<variablevalue>"
-    * 
+* Create a file: New-Item -Path . -Name "testfile.txt" -ItemType "file"

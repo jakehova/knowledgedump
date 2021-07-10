@@ -11,7 +11,9 @@ Docker Client is native to Linux (Linux Container Support LXC) and Windows Serve
 
 - The benefit of this is that you can use one image and have multiple containers on top of that one image.  Since that image is read only, each container built on top of it can be sure that its working from a consistent foundation
 
-
+## Publishing to Docker Hub
+    * docker login 
+    * docker push <image name>
 ## Terms
 Image - Contains instructions for how to create an active container. Is a read only template composed of layered filesystems to share common files and create Containers
 Container - Created from an Image and is what actually runs your application.  An isolated and secured shipping container created from an image that can be run, started, stopped, moved, and deleted.
@@ -19,6 +21,8 @@ Volumes - special directory reference in a container.  The aliased directory (th
     * A volume path is specified in a container.  That path is an ALIAS for an actual directory on the HOST machine.  
     * Updating an image does not affect a volume.  
     * Volumes are persisted even after a container is deleted.
+    * docker inspect --format '{{ .Mounts }}' <container id> => returns the volume information including actual location on host where data is stored.
+   
 
 ## Links
 [Common Commands](./developing/docker-commands.md)

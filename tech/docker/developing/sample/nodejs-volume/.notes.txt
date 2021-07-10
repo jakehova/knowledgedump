@@ -1,0 +1,10 @@
+Run with local volume and directly from commandline: 
+* created this using express generator: npm install express express-generator -g
+* create project with handlebars support: express . -hbs
+* install node modules: npm install
+* pull docker node container: docker pull node
+* move current working directory to the directory created by express-generator
+* run docker container with port forwarding and volume creation: docker run -p 8080:3000 -v ${pwd}:/var/www -w "/var/www" node npm start
+
+Build an image with it using dockerfile
+* create "Dockerfile" file
