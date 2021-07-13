@@ -84,4 +84,6 @@ Open Ubuntu Terminal:
         * create password file
             * create a password file: touch /chainlink-kovan/.password
             * update password file with validator keys password
-        * can now use this alias "restart_kovan_primary" to kill the chainlink process and restart it.
+        * use "restart_kovan_primary" alias to kill the chainlink process and restart it.
+        * use "tail_kovan_primary" to view the last 10 logs 
+        * use "follow_kovan_primary" to view logs as they happen
