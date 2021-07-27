@@ -1,7 +1,8 @@
 # Chainlink
 
 ## What
-
+Chainlink allows decentralized logic of smart contracts to interact with decentralized data from the real world.  
+* Can pull price of a token 
 
 
 ## Digital Ocean Example connector

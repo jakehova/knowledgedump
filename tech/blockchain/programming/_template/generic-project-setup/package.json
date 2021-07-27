@@ -1,19 +1,16 @@
 {
-  "name": "arb-bot",
+  "name": "generic-project-setup",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@studydefi/money-legos": "^2.3.3",
-    "@truffle/hdwallet-provider": "^1.0.35",
-    "@uniswap/sdk": "^2.0.5",
-    "dotenv": "^8.2.0",
-    "web3": "^1.2.9"
+    "dotenv": "^10.0.0",
+    "web3": "^1.4.0",
+    "@uniswap/sdk": "3.0.3"
   }
 }
