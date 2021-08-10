@@ -1,0 +1,51 @@
+{
+  "version": 2,
+  "dgSpecHash": "UvaTHvdvDZPux2AiDuFEOWnKw/ydg4M2wj1cJ06sV+lSdARsdsXva+p27o7j6K8/8abCE+CXtBQUYxiuB2zswA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\jacob\\source\\repos\\my-brain\\personal\\tech\\rpa\\uipath\\_sample\\_studioX\\excel_parser\\resources\\First Automation - StudioX\\.local\\",
+  "expectedPackageFiles": [
+    "C:\\Users\\jacob\\.nuget\\packages\\avalonedit\\5.0.3\\avalonedit.5.0.3.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\bouncycastle\\1.8.5\\bouncycastle.1.8.5.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\closedxml\\0.87.1\\closedxml.0.87.1.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\csvhelper\\2.13.5\\csvhelper.2.13.5.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\documentformat.openxml\\2.5.0\\documentformat.openxml.2.5.0.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\docx\\1.0.0.18\\docx.1.0.0.18.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\extended.wpf.toolkit\\2.8.0\\extended.wpf.toolkit.2.8.0.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\interop.domino.dll\\1.0.0\\interop.domino.dll.1.0.0.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\microsoft.aspnet.signalr.client\\2.4.0\\microsoft.aspnet.signalr.client.2.4.0.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\microsoft.exchange.webservices\\2.2.0\\microsoft.exchange.webservices.2.2.0.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\microsoft.office.interop.word\\15.0.4797.1003\\microsoft.office.interop.word.15.0.4797.1003.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\microsoft.rest.clientruntime\\2.3.20\\microsoft.rest.clientruntime.2.3.20.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\microsoft.visualstudio.ole.interop\\7.10.6071\\microsoft.visualstudio.ole.interop.7.10.6071.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\npoi\\2.4.1\\npoi.2.4.1.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\sharpziplib\\1.0.0\\sharpziplib.1.0.0.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\system.io.abstractions\\3.0.10\\system.io.abstractions.3.0.10.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\system.valuetuple\\4.5.0\\system.valuetuple.4.5.0.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\uipath\\20.4.7369.30616-alpha\\uipath.20.4.7369.30616-alpha.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\uipath.complexscenarios.activities\\1.0.1-preview\\uipath.complexscenarios.activities.1.0.1-preview.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\uipath.excel.activities\\2.8.2-preview\\uipath.excel.activities.2.8.2-preview.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\uipath.mail.activities\\1.8.2-preview\\uipath.mail.activities.1.8.2-preview.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\uipath.ocr.contracts\\2.6.0\\uipath.ocr.contracts.2.6.0.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\uipath.omnipage.activities\\1.4.1-preview\\uipath.omnipage.activities.1.4.1-preview.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\uipath.omnipage.bundle\\1.0.1\\uipath.omnipage.bundle.1.0.1.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\uipath.system.activities\\20.3.0-preview\\uipath.system.activities.20.3.0-preview.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\uipath.uiautomationnext.activities\\2.1.0-alpha\\uipath.uiautomationnext.activities.2.1.0-alpha.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\uipath.vision\\2.0.3\\uipath.vision.2.0.3.nupkg.sha512",
+    "C:\\Users\\jacob\\.nuget\\packages\\uipath.word.activities\\1.4.1-preview\\uipath.word.activities.1.4.1-preview.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1603",
+      "level": "Warning",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\jacob\\source\\repos\\my-brain\\personal\\tech\\rpa\\uipath\\_sample\\_studioX\\excel_parser\\resources\\First Automation - StudioX\\.local",
+      "message": "UiPath.UIAutomationNext.Activities 2.1.0-alpha depends on UiPath.Vision (>= 2.0.2-preview) but UiPath.Vision 2.0.2-preview was not found. An approximate best match of UiPath.Vision 2.0.3 was resolved.",
+      "libraryId": "UiPath.Vision",
+      "targetGraphs": [
+        ".NETFramework,Version=v4.6.1",
+        ".NETFramework,Version=v4.6.1/win7-x86"
+      ]
+    }
+  ]
+}

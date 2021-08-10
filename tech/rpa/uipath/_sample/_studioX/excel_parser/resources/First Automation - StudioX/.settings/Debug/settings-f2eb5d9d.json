@@ -1,0 +1,15 @@
+{
+  "UiPath.UIAutomationX.Activities.Generic.DelayAfter": "300",
+  "UiPath.UIAutomationX.Activities.Generic.DelayBefore": "200",
+  "UiPath.UIAutomationX.Activities.Generic.Timeout": "30000",
+  "UiPath.UIAutomationX.Activities.SearchSteps.Selectors": "True",
+  "UiPath.UIAutomationX.Activities.SearchSteps.Image": "True",
+  "UiPath.UIAutomationX.Activities.SearchSteps.TextNative": "True",
+  "UiPath.UIAutomationX.Activities.SearchSteps.TextOcr": "True",
+  "UiPath.UIAutomationX.Activities.CheckState.CheckStateTimeout": "10000",
+  "UiPath.UIAutomationX.Activities.DataScrape.DelayBetweenPages": "300",
+  "UiPath.UIAutomationX.Activities.Highlight.HighlightTime": "1000",
+  "UiPath.UIAutomationX.Activities.Hover.HoverTime": "2000",
+  "UiPath.UIAutomationX.Activities.KeyboardEvents.ClickBeforeMode": "Single",
+  "UiPath.UIAutomationX.Activities.KeyboardEvents.EmptyFieldMode": "SingleLine"
+}
