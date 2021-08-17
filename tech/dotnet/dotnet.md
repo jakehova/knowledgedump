@@ -1,5 +1,7 @@
 # .NET 
 
+https://jasontaylor.dev/clean-architecture-getting-started/
+
 ## EF Core
 **Best Practices**
 * Only data layer should have a dependency on Entity Framework
