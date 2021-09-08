@@ -129,7 +129,6 @@ Who is the audience? For Who?
 * How do you respond to RFIs?
 * Do you have an approach to reading solicitations?
 * How do you identify competition and competitive strategoies?
-* 
 
 ## Issues 
 * Too much focus/time spent on proposals with low inprobablity
