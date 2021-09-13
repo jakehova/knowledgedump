@@ -1,8 +1,65 @@
 # Setting up a Local Dev Environment
 
-* Use [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-contracts) library of Eth smart contracts to perform common functions (like math functions) 
-  * import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-  
+## Basics
+**Install truffle** - used to compile your solidity code
+```
+npm install -g truffle
+```
+Create a truffle project: 
+```
+truffle init
+```
+
+* Can also use starter sets by using [Truffle Boxes](https://www.trufflesuite.com/boxes)
+* Generates: 
+    * truffle-config.js - truffle configuration file
+    * contracts folder - holds contracts
+    * migrations folder - scriptable deployment files
+    * test - test files for your application and contracts
+Compile Contracts
+```
+truffle compile
+```
+**install ganache** - used to run a fake ethereum chain on your local machine
+```
+npm install -g ganache-cli
+```
+* run ganache
+```
+ganache-cli
+```
+**install ipfs** - used for distributed storage
+```
+npm install -g ipfs
+```
+* run ipfs local-dev instance
+```
+jsipfs daemon
+```
+## Tools
+* [REMIX](https://remix.ethereum.org/) - online IDE for Eth contracts
+* [Ganache](https://www.trufflesuite.com/ganache) - ETH simulator -> this is not the command line version 
+* [Ganache-CLI](https://github.com/trufflesuite/ganache-cli) - ETH simulator that speeds up process of setting up private network and txs are mined immediately
+* [GETH](https://geth.ethereum.org/) (Go Ethereum client)  - used to interact with ETH network
+  * eth.sendTransaction(): send tx obj.  GETH will help signing tx if it has access to private key
+  * eth.sendRawTransaction(): sending serialized signed tx. Used when private key is NOT handled by geth. 
+* [Truffle](https://truffleframework.com) - used to develop and test dapps and smart contracts on eth
+* [Drizzle](https://www.trufflesuite.com/drizzle) - React library that live updates a redux store with eth data
+
+## Setup
+1) create front end project; npx create-react-app <appname>
+   1) update package.json with package-example.json 
+2) create truffle project
+   1) truffle init
+   2) update truffle-config.json: 
+
+
+
+3) add .babelrc file with: { "presets": ["es2015", "stage-2", "stage-3"] } 
+4) add .env file (accessed via npm package dotenv)
+5) smoke test by running truffle compile from command line and confirming that ABI is generated for each contract in contracts folder
+6) run truffle migrate to deploy the contracts to the blockchain (defined in truffle-config file)
+
 ## Fork Mainnet - Development Environment
 - install node/npm 
 - npm install ganache-cli -g 

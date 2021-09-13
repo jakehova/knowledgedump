@@ -481,7 +481,8 @@ contract ERC721 {
   uint8 shortNumber = 0;  // this is the lowest number a uint can hold
   shortNumber--;          // this would make shortNumber = -1 which isnt possible.    
   ```
-  * Resolution: Use OpenZeppelin library "SafeMath" to prevent issues like this. Copy the OpenZeppelin SafeMath sol that includes safemath library (in samples/zombie-game/contracts).  Extend the type that you want to use the safemath library with (i.e. using SafeMath for uint256)
+  * Resolution: Use [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-contracts) library of Eth smart contracts to perform common functions (like math functions) 
+  * import 'openzeppelin-solidity/contracts/math/SafeMath.sol'; library "SafeMath" to prevent issues like this. Copy the OpenZeppelin SafeMath sol that includes safemath library (in samples/zombie-game/contracts).  Extend the type that you want to use the safemath library with (i.e. using SafeMath for uint256)
   ```
   contract Example {
     using SafeMath for uint256;
