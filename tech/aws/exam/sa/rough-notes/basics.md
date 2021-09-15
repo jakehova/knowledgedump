@@ -28,3 +28,4 @@
 * [Architechture day to day operations help](https://aws.amazon.com/architecture/) 
 * [Tool to generate well archtected architecture](https://aws.amazon.com/well-architected-tool))
 * [AWS Schema Conversion Tool](https://docs.aws.amazon.com/SchemaConversionTool/latest/userguide/CHAP_Welcome.html)
+* [AWS Architechture Icons](https://aws.amazon.com/architecture/icons/)

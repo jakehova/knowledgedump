@@ -11,131 +11,119 @@
 * What is Layer 7 or 4 with regards to the ELB?
 * Step Scaling is a best practice.  Need to look that up 
 
-## Networking Part 2
-**Virtual Private Gateway (VGW)** - Connecting OnPrem to AWS
-    * Enables you to establish private connections (VPNs) between an Amazon VPC and another network
-    * Provides two endpoints 
-    * **VPN Cloud Hub** Can provide multiple VPN connections to multiple networks connected to one VGW
-**AWS Direct Connect** - provides you with dedicated private network connection of either 1 or 10Gbps
-    * Hybrid Cloud Architechtures
-    * Contrinually transferring large data sets
-    * Network Performance predictability
-    * Security and Compliance
-    * CONS: May require need to setup physical network circuits to setup a direct connect
-    **Note:** - Good to setup a backup VPN connection through a different internet service provider as a backup to Direct Connect in case Direct Connect goes down
-**VPC Endpoint** - privately connect your EC2 instances to services outside your VPC (without leaving AWS)
-    * Dont need to use internet gateway, VPN, network address translation (NAT) devices
-    * Types
-        * Interface Endpoint
-        * Gateway Endpoint 
-            * Amazon Simple Storage Service (S3)
-            * Dynamo DB
-**Elastic Load Balancing (ELB)** - managed load balancing service that distributes incoming application traffic across multiple EC2s or services
-    * uses http, https, tcp, ssl 
-    * external/interal facing
-    * each load balancer is given a DNS name
-    * performs health checks and resolves most 
-    * Types
-        * Application Load balancer
-            * flexible app mgmt
-            * advanced load balancing of http/https traffic
-            * Operates at request level (Layer 7)
-        * Network Load balancer
-            * Extremem performance and static IP for your application
-            * Load balancing of TCP, TLS, UDP traffic
-            * Operates at the connection level (Layer 4) 
-        * Classic Load Balancer - deprecated
-    * Deregistration delay - remove an instance from elb options without affecting users (delays registration until that that node is complete with its processing)
-**High Availability**
-    * Design for no single point of failure and duplicative environment in at least 2 AZs (i.e. two app servers pointing to one db is BAD.)
-    * RDS generates does auto fail over 
-**Route 53** - highly available and scalable cloud Domain Name System (DNS) service (port 53 is used for DNS which is where Route 53 is named the way it is)
-    * Performs regular DNS Health Checks (can perform automatic fail overs)
-    * Routing options
-        * Simple Round Robin - just go one elb at a time
-        * Weighted Round Robin - go to preferred elb 
-        * Latency-based routing - route based on latency of networks
-        * Health Check and DNS failover - active/passive failover
-        * Geolocation routing - route based on user location
-        * Geoproximity routing with traffic biasing - route based on user location and 
-        * Multi-value answers - 
+# SNS/SQS
+* Problem: Web Tier and App Tier are tightly coupled.
+    * Solution 1: Put Elastic Load Balancer (ELB) in between web and app tier.  Issue with this is that if there are any network issues, use queueing
+    * Solution 2: Use SQS 
+**SQS**
+* Pros
+    * Fully managed queuing service
+    * Messages are stored until they are processed and deleted
+    * Acts as a buffer between senders and receivers
+* Types
+    * Standard Queue: At least once delivery
+        * Messaging Limit: Nearly unlimited
+    * FIFO Queues: Messages are processed exactly once in the exact order
+        * Messaging Limit: 300 Messages a second 
+* Features
+    * Persists Messages
+    * Long Polling
+    * Send/receivers
+    * One to One
+    * Dead Letter Queue (DLQ): Move messages that cant be processed to this queue.
+    * Visibility Timeout: When a message is pulled off the queue while its not deleted it is made invisible to other processes acting on the queue
+    * Long Polling: Reduces costs 
+* Message has limitation of 256k
+* Process
+    1 Producer sends message to queue which gets distributed redundantly
+    2 Message gets picked up for processing by consumer and visibility timeout starts
+    3 Message gets deleted by consumer after receiving and processing it
+**SNS**
+* Coordinates and manages messaging between publishers and subscribers
+* Subscription Types
+    * Email
+    * Http/Https
+    * SMS
+    * SQS
+    * Lambda Functions
+* Characteristics
+    * No message persistence
+    * Push 
+    * pub/subscribers
+    * one to many communication
+    * Single Published Message
+    * No recall options
+    * Http/Https retry
+    * Order and delivery not guaranteed
+**Amazon MQ**
+* When to Use: Using a messaging system with an existing application and want to move the application to the cloud otherwise use SNS/SQS
+* Manged message broker service for Apache MQ
+* Makes it easy to setup and operate message brokers in the cloud
+* Direct access to Active MQ conole
+* Compatible with open standard APIs and protocols: JMS, NMS, AMQP, STOMP, MQTT, and WebSocket
 
+    
+# Microservices
+**Elastic Container Service**
+* Container Management Service
+* Orchtestrates the execution of containers
+* Maintains and scales the fleet of nodes running your containers
+* Removes the complexity of standing up the infrastructure
+**Fargate**
+* Fully managed container service
+* Provisioning and managing clusters
+* Scaling
+* You can run EKS and ECS on AWS Fargate
+**Elastic Container Registry**
+* Fully managed Docker Container Registry
+**Lambda**
+* Fully managed compute service
+* Runs stateless code
+* Can run at edge
+**API Gateway**
+* Prevents exposing endpoints
+* Protection from DDoS and injection attacks
+* Host and use multiple versions and stages of your APIs
+* Create and distribute API keys to developers
+* Leverage signature version 4 to authorize access to APIs
+* Integrates with Lambda OR as a VPC endpoint 
+**AWS Step Functions**
+* Coordinates Microsoervices using visual workflows
+* Allows you to step through the functions of your application
+* Automatically triggers and tracks each step
+* Provides simple error catching and logging if a step fails
+* Is a State Machine 
 
-## IAM -
-* Root User has unlimited access to your AWS account.  Cannot be limited. NEVER USE ROOT USER
-* Identity Based Policy
-    * Attached to: User, group, or role
-* IAM Groups
-* IAM Roles - A role lets you define a set of permissions to access the resources that a user or service needs
-    * Use Cases: 
-        * AWS Resources with access to AWS services
-        * Provide access to externally authenticated users
-        * Provide access to third parties 
-        * Can be used to grant credentials temporarily 
-* Using Groups vs Using Roles
-    * Roles are for individual things (users or services).  Groups are for users.  Your employees/contractors would be part of groups.  If one of them needs access to a service or environment temporarily, then you would create a role and assign that role to them. 
-* STS Identity Broker
-* SAML 
-* **AWS Cognito** - fully managed service that provides authentication, authorization, and user management for web/mobile apps
-    * User Pools - user directory 
-    * Identity Pools - federated identities - create uniqe identies for your users and federate them with your users
-* **AWS Landing Zone** - helps customers more quickly set up a secuire, multi-account AWS environment based on AWS best practices
-* **AWS Organizations** - Centralized account management
-    * NO CHARGE & BEST PRACTICE To manage users 
-    * Group-based account management
-    * Policy-based access to AWS Services
-    * Automated account creation and management
-    * Consolidated billing
-    * API-based
-    * Root has OUs. OU has AWS Account * Resources. Service Control Policies apply to each layer.
+# Disaster Planning/Recovery 
+* Recovery Point Objective (RPO)/Recovery Time Objective (RTO)
+    * RPO - How often does data need to be backed up
+        * Example: Business can recover from losing at most the last 12 hours of data
+    * RTO - How long can app be unavailable
+        * Example: Application can be down and unavailable for a max of 1 hour
+* Storage Backup DR Options
+    * **S3**
+        * DR - Cross-Region replication
+        * Glacier - Data stored in regional vaults
+        * EBS - create point in time volume snapshots and copy snapshots across regions and accounts
+        * AWS DataSync - 
+    * **AWS Backup**
+        * Centralized Backup service to backup application data across services
+* Networking DR Options
+    * **Amazon Route 53** 
+        * Traffic distribution
+        * Fallover
+    * **ELB**
+        * Includes load balancing/health checks and failover
+    * **Amazon VPC**
+        * Extend your on-prem network topology to the cloud
+    * **AWS Direct Connect**
+        * Fast and consistent backup/replication of your large on-prem env in the cloud
+    
+# Optimizations
+* What do I need right now?
+* Can I afford to pay for capacity I'm not really using?
+* Are there single points of failure?
+* Can it recover from disaster?
+* Is it self healing? 
+* Are there any tight dependencies? Switch to Microservices
 
-## Elascity/HA
-**Scalability**
-* Types 
-    * Time BAsed - turn off resources when they are not being used
-    * Volume based - match scale to the intensity of your demand 
-    * Predictive Based - predict future traffic based on daily/weekly trends
-* Monitoring
-    * **AWS Cost Explorer** - Monitor your service usage and respective cost along with generating estimations for future use.
-    * **Amazon CloudWatch** -
-        * collects and tracks metrics for your redsources
-        * enables you to create alarms and send notifications
-        * can trigger changes in capacity in a resource based on rules you set 
-        * Targets: Metrics, Logs, Alarams, Events, Rules, Targets(Services like SNS, SQS, etc)
-    * **AWS CloudTrail** - Records all API calls made in your account and saves logs in your designated S3 bucket
-    * **VPC Flow Logs** - Catpures traffic flow details in your VPC
-        * Can be enabled at VPC, subnet, or ENI level
-    * Things you want to monitor
-        * Operational Health
-        * Resource utilization
-        * App Performance
-        * Security Auditing 
-* **Amazon EC2 Auto Scaling**
-    * Types
-        * Scheduled - good for predictable workloads (i.e. turning off dev and test instances at night)
-        * Dynamic - excellent for general scaling (scaling based on CPU utilization)
-        * Predictive
-    * How - Adds EC2 to Auto Scaling Group.  When adding to auto scaling group, can pick on-demand or spot scaling for that group
-    * **Auto Scaling Group (ASG)** - Set Desired, min, max capactiy with regards to # of EC2 instances.  
-        * Question: Whats a good min/max capactiy to set => use trial and error 
-    * Considerations 
-        * Might need to combine multiple types of autoscaling
-        * architechture might require  more hands scaling using **Step Scaling**
-        * some architechtures need to scale on two or more metrics (not just CPU)
-        * scale out early and fast, while scaling in slowly over time.  Scale out means expand.  Scale In means condense.
-        * use lifecycle hooks 
-            * perform custom actions as auto scaling launches or terminates instances 
-    * Scaling your Database     
-        * Read Replicas
-            * horizontally scaling read-heavy workloads
-            * offload reporting
-            * Aurora can have up to 15 read replicas spread across multiple AZs
-            * Considerations
-                * replication is async so potential for reading stale data.
-                * avail for Aurora, MySQL, MariaDB, PostgreSQL, Oracle
-        * Push Button Scaling 
-            * Vertical scaling up/down.
-        * Scaling Amazon RDS write with Database Sharding (sharding is partitioning the data where each partition is in its own database)
-        * Aurora Serverless - responds automatically to usage.  scales capacity, shuts down, starts up on its own.
-            * pay for the number of ACUs used
-            * good for spiky, unpredicatable workloads

@@ -74,6 +74,13 @@
     * virtual network interafce that can be moved across EC2 instances in the same AZ
     * when moved maintains private IP addresses, elastic IP address, public IP address
     * max of 5 per region
+**VPC Endpoint** - privately connect your EC2 instances to services outside your VPC (without leaving AWS)
+    * Dont need to use internet gateway, VPN, network address translation (NAT) devices
+    * Types
+        * Interface Endpoint
+        * Gateway Endpoint 
+            * Amazon Simple Storage Service (S3)
+            * Dynamo DB
 
 VPC 10.1.0.0/16
 Inbound Traffic goes through internet gateway -> VPC -> then route table -> network ACL -> Subnet -> security group - EC2 Instance

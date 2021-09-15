@@ -192,6 +192,167 @@ service httpd start
 
 
 **Automating infrastructure deployment with AWS Cloud Formation**
+* **Best Practice** - deploy infrastructure in layers
+    * Common Layers Networking, Application, DB
+* Go to Cloud Formation -> Create Stack -> With new resources -> upload file
+* Events show whats happening
+* Resources show all resources that are being worked on 
+* Outputs show the ids of specific resources and links to resources
+* A Cloud Formation stack can reference other stacks
+```
+  WebServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP ingress
+      VpcId:
+        Fn::ImportValue:
+          !Sub ${NetworkStackName}-VPCID
+
+```
 
 **Implementing a Serverless Architechture with AWS Managed Services**
+* Create Lambda to process inventory file
+    * Lambda -> Create Function -> Author from scratch -> Python -> Use Existing Role (role was created prior to lab). Role Contains: 
+ ```
+    AmazonDynamoDBFullAccess
+    AmazonS3ReadOnlyAccess
+    CWLogsPolicy
+    {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "arn:aws:logs:*:*:*",
+            "Effect": "Allow"
+        }
+    ]
+}
+```
+    * Copy this code into the Lambda Function and Deploy
+```
+    # Load-Inventory Lambda function
+#
+# This function is triggered by an object being created in an Amazon S3 bucket.
+# The file is downloaded and each line is inserted into a DynamoDB table.
 
+import json, urllib, boto3, csv
+
+# Connect to S3 and DynamoDB
+s3 = boto3.resource('s3')
+dynamodb = boto3.resource('dynamodb')
+
+# Connect to the DynamoDB tables
+inventoryTable = dynamodb.Table('Inventory');
+
+# This handler is run every time the Lambda function is triggered
+def lambda_handler(event, context):
+
+  # Show the incoming event in the debug log
+  print("Event received by Lambda function: " + json.dumps(event, indent=2))
+
+  # Get the bucket and object key from the event
+  bucket = event['Records'][0]['s3']['bucket']['name']
+  key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'])
+  localFilename = '/tmp/inventory.txt'
+
+  # Download the file from S3 to the local filesystem
+  try:
+    s3.meta.client.download_file(bucket, key, localFilename)
+  except Exception as e:
+    print(e)
+    print('Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.'.format(key, bucket))
+    raise e
+
+  # Read the Inventory CSV file
+  with open(localFilename) as csvfile:
+    reader = csv.DictReader(csvfile, delimiter=',')
+
+    # Read each row in the file
+    rowCount = 0
+    for row in reader:
+      rowCount += 1
+
+      # Show the row in the debug log
+      print(row['store'], row['item'], row['count'])
+
+      try:
+        # Insert Store, Item, and Count into the Inventory table
+        inventoryTable.put_item(
+          Item={
+            'Store':  row['store'],
+            'Item':   row['item'],
+            'Count':  int(row['count'])})
+
+      except Exception as e:
+         print(e)
+         print("Unable to insert data into DynamoDB table".format(e))
+
+    # Finished!
+    return "%d counts inserted" % rowCount
+```
+    
+* Configure Amazon S3 Event 
+    * S3 -> Create bucket
+    * Click on Bucket -> Properties Tab -> Event Notifications -> Create Event Notification -> Select "All Object Create Events" -> Specify Lambda to trigger
+* Configure Notifications
+    * SNS -> Create Topic Name -> Standard
+* Create Subscription to Notifications
+    * Select the topic you want to subscribe to -> click Subscriptions Tab -> Create Subscription
+* Create Lambda triggered on record insert to dynamo db to publish messge on SNS
+    * Lambda -> Create Function -> Author from scratch -> Python -> Use Existing Role (role was created prior to lab). Role Contains: 
+```
+AWSLambdaDynamoDBExecutionRole
+AmazonSNSFullAccess
+```
+    * Copy this code into the Lambda Function and deploy: 
+```
+# Stock Check Lambda function
+#
+# This function is triggered when values are inserted into the Inventory DynamoDB table.
+# Inventory counts are checked, and if an item is out of stock, a notification is sent to an SNS topic.
+
+import json, boto3
+
+# This handler is run every time the Lambda function is triggered
+def lambda_handler(event, context):
+
+  # Show the incoming event in the debug log
+  print("Event received by Lambda function: " + json.dumps(event, indent=2))
+
+  # For each inventory item added, check if the count is zero
+  for record in event['Records']:
+    newImage = record['dynamodb'].get('NewImage', None)
+    if newImage:
+
+      count = int(record['dynamodb']['NewImage']['Count']['N'])
+
+      if count == 0:
+        store = record['dynamodb']['NewImage']['Store']['S']
+        item  = record['dynamodb']['NewImage']['Item']['S']
+
+        # Construct message to be sent
+        message = store + ' is out of stock of ' + item
+        print(message)
+
+        # Connect to SNS
+        sns = boto3.client('sns')
+        alertTopic = 'NoStock'
+        snsTopicArn = [t['TopicArn'] for t in sns.list_topics()['Topics']
+                        if t['TopicArn'].lower().endswith(':' + alertTopic.lower())][0]
+
+        # Send message to SNS
+        sns.publish(
+          TopicArn=snsTopicArn,
+          Message=message,
+          Subject='Inventory Alert!',
+          MessageStructure='raw'
+        )
+
+  # Finished!
+  return 'Successfully processed {} records.'.format(len(event['Records']))
+```
+    * Click "Add Trigger" -> Select Dynamo DB -> Select Table 
