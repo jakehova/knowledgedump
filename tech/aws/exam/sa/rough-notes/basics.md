@@ -15,6 +15,24 @@
     * 200+ edge locations
     * act similar to CDNs as cache points run on cloudfront 
 
+## Questions to Ask When Architecting
+* What do I need right now?
+* Can I afford to pay for capacity I'm not really using?
+* Are there single points of failure?
+* Can it recover from disaster?
+* Is it self healing? 
+* Are there any tight dependencies? Switch to Microservices
+
+## Supplemental Information
+* [AWS Documentation](https://docs.aws.amazon.com/)
+* [Self Paced Labs](https://aws.amazon.com/training/self-paced-labs/)
+* [Hands On Tutorial](https://aws.amazon.com/getting-started/hands-on)
+* [Case Studies](https://aws.amazon.com/solutions/case-studies)
+* [Blogs](https://aws.amazon.com/blogs/aws/)
+* [Whats New](https://aws.amazon.com/new)
+* [Certification Prep](https://aws.amazon.com/certification/certification-prep/)
+* [Certification FAQ](https://aws.amazon.com/certification/faqs/)
+
 ## Tags
 * [Best Practices](https://d1.awsstatic.com/whitepapers/aws-tagging-best-practices.pdf)
 * Each tag has a key/value pair
