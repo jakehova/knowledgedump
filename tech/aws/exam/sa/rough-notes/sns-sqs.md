@@ -25,7 +25,7 @@
 * Process
     1 Producer sends message to queue which gets distributed redundantly
     2 Message gets picked up for processing by consumer and visibility timeout starts
-    3 Message gets deleted by consumer after receiving and processing it
+    3 Message gets deleted after visibility timeout expires or by consumer directly (via deleteMessage command using receiptHandle value of message)
 **SNS**
 * Coordinates and manages messaging between publishers and subscribers
 * Subscription Types

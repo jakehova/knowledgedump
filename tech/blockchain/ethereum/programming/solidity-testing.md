@@ -1,7 +1,7 @@
 # Testing 
 
 ## Setting up Testing
-
+* Process => Setup, Act, Assert
 
 
 ## Non-Local Test Networks
