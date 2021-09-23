@@ -1,6 +1,15 @@
 # Exam Notes
 
-
+**OSI Model**
+* conceptual framework used to describe functions of a networking system.
+* 7 layers: 
+    1 Physical layer - transmission and reception of raw bit streams over a physical medium ( network hubs, cabling, repeaters, network adapters, modems, etc)
+    2 Data link layer - reliable transmission of data frames between two nodes connected by a physical layer
+    3 Network layer - Addressing, routing, traffic control
+    4 Transport layer - reliable transmission of data segments between poinst on a network (segementation, acknowledgement, multiplexting)
+    5 Session layer - continuous exchange of info in the form of multiple back-and-forth transmissions between two nodes
+    6 Presentation layer - Character encoding, data compression, encryption/decryption
+    7 Application Layer  - High Level APIs
 
 **VPC communication**
 * AWS Transit Gateway connects your VPC to on-prem networks through a central hub
@@ -24,7 +33,7 @@
         * Snapshots are sent to S3
         * **NOTE** does NOT support object/file lock
 * Scaling   
-    * Simple Scaling - waits for a cool down period (default to 300 seconds) to expire before spinning up the next instance
+    * Simple Scaling - waits for a cooldown period (default to 300 seconds) to expire before spinning up the next instance
         * Target Tracking Scaling - increases or decreases instances based on the target value of a metric.  Scales out or in to keep as close to target value of metric as possible
         * Scheduled Scaling - scales based on predicted patterns
         * Suspend/Resme Scaling - temporarily pauses scaling activities
@@ -34,7 +43,15 @@
         * Public IP
         * Public Keys
     * User Data - used to perform common automated config tasks and run scripts after the instance starts
-    
+* Placement Group
+    * used to provide low-latency network perf for tightly copuled node-to-node communication
+
+**Amazon Lightsail**
+* offers cloud servers for really cheap prices
+
+**Amazon Data Lifecycle Manager (DLM)**
+* automate creation, retention, deletion of snapshots taken to backup your EBS volumes. 
+
 **Application Load Balancer (ALB)**
 * routes traffic to targets (EC2, containers, IP addresses, Lambdas) based on the content of the request
 * ideal for load balancing http/https traffic.
@@ -45,20 +62,37 @@
     * http method-based: based on any standard or custom HTTP method
     * query string parameter-based: based on query string or query parameters
     * source ip address CIDR-based: based on source IP address CIDR from where the request originates
+* DOES support SNI
 
-**Network Load Balancer**
+**Network Load Balancer (NLB)**
 * routes traffic to targets
 * does NOT support path-based routing or host-based routing
 
-**Classic Load Balancer**
+**Classic Load Balancer (CLB)**
 * use for aps that are built within the EC2-Classic network only.
 * does NOT support path-based routing or host-based routing
+* does NOT support SNI
 
-**Gateway Load Balancer**
+**Gateway Load Balancer (GLB)**
 * used for deploying, scaling, and running 3rd party virtual appliances.  
 * does NOT support path-based routing or host-based routing
 
 **CloudFront**
+* Used as a CDN - delivers content from each edge location
+* Uses Server Name Indication (SNI) to provide https. 
+    * SNI is an extension of TLS
+    * Setup: 
+        * CloudFront associates your alternate domain name with an IP address for EACH edge location
+        * When a viewer submits an https request for content, DNS routes the request to the IP address for the proper edge location
+            * The IP address to your domain name is determined during the SSL/TLS handshake.
+    * Request Process: 
+        * viewer makes https request for content
+        * viewer automatically gets the domain name from the request url and adds it to the request header
+        * CloudFront receives the request, finds the domain name in the request header, and responds to the request with the applicable SSL/TLS cert
+        * viewer and CloudFront perform SSL/TLS negotiation
+        * CloudFront returns the requested content to the viewer
+    * If you have to support browsers that do not support SNI, then use dedicated IP addresses in each edge location
+
 * Signed URLs and Signed Cookies allow you to control who can access your content. 
     * Signed URLs if you are restricting to individual files. Signed Cookies if you are restricting to multiple files OR dont want to change your current URLs.
 * MatchViewer configures cloudfront to communicate with your origin using Http or Https depending on the protocol of the viewer request.
@@ -68,14 +102,48 @@
     * geo-restriction - prevents users in specific geographic locations form accessing content that is distributed through CloudFront web distribution.
 
 **Route 53**
+* HA and scalable DNS web service.
+* Functions: 
+    * domain registration
+    * DNS routing
+    * health checking
 * Routing Strategies
-    * Geolocation routing lets you choose the resources that server your traffic based on geogrpahic location of your user. 
+    * Latency Routing serves requests from the AWS region that provides the lowest latency.
+    * Geolocation routing lets you choose the resources that serve your traffic based on geogrpahic location of your user. 
+    * Geoproximity routing serves requests based on geographic location of the user AND the resources they are reaching. 
+        * Can also implement a bias which lets you shrink/expand the size of a geographic region from which traffic is routed to a resource
     * Weighted routing lets you choose how much traffic is routed to each resource within a single domain or subdomain.
+* Failover routing policy
+    * can add a health check on an primary resource and have it failover to a secondary resource when the primary is unhealthy
+        * Need to configure NACL and route table to allow 53 to send requests the endpoints specified.  
+        * need to enable "Evaluate Target Health" option
+* When using Route 53 w/ S3 to serve a static site.  Need to:
+    * Setup S3 bucket: 
+        * to be configured as a static website.  
+        * bucket must have the same name as the domain/subdomain.
+    * setup a registered domain name in Route 53
+    * Setup Route 53 as the DNS for the domain. 
+        * If Route 53 was used to register the domain name, then it is automatically confgured to be the DNS for the domain
+* DNS Record Info: 
+    * CNAME records are only for subdomains
+    * MX records are for mail servers
+    * A records are for IPv4 address connections
+    * AAAA records are for IPv6 address connections 
+    
 
-**WAF**
+**Web Application Firewall (WAF)**
+* monitors http/https requests
+* lets you control access to your content via
+    * IP Addresses that requests original from 
+    * values in query strings
+* Acts in one of these ways: 
+    * Allow all requests except the ones you specify => use when CloudFront or ALB serves content but block requests from attackers
+    * Block all requests except the ones you specify => serve content for a restricted website whose users are readily identifiable by properties of web request (like their IP addresses)
+    * Count the requests that match the properties you specify => allow/block requests based on new props of requests. 
 * Integrates w/CloudFront, ALB, API Gateway, and AppSync.  
     * WAF rules run at edge locations so blocked requests are blocked before they get to web servers. 
         * Can create regular rules or rate limit rules.
+* Can protect against sql code injection or cross site scripting
 
 **AWS Shield**
 * Protects against network and transport layer attacks targetting apps running in EC2, ELB, CloudFront, and Route 53.
@@ -90,6 +158,7 @@
 **AWS Macie**
 * Amazon Macie is an ML-powered security service that discovers, classifies, and protects sensitive data stored in S3.
 
+
 **Amazon Rekognition**
 * Service to identify objects, people, text, scenes, and activities
 
@@ -100,11 +169,37 @@
 * Allows management of AD accounts and group memberships, create and apply group policies, and securely connect to Amazon EC2 instances, and provide Kerberos SSO
 
 
-**AWS ECS**
+**AWS Elastic Container Service (ECS)**
 * Fully managed Orchestration Service for deployment, management, scaling of container apps.
 * Secure environment variables using AWS Secrets Manager or Systems Manager Parameter Store. specify `secrets` w/name of environment variable to pass a secret to a container 
 * Docker secrets are not availble in ECS 
 
+**AWS Elastic Load Balancer (ELB)**
+* load balances traffic between EC2 instances.
+
+**Network Load Balancer (NLB)**
+* receives connection requests and opens a tcp connection on a selected target on the port specified in the listener Configuration
+* before application and elastic load balancer
+* Can use Bring Your Own IP (BYOIP) feature of an NLB to use trusted IPs as Elastic IP adddresses (EIP)
+    * **Note** Cannot use EIP with ALB 
+
+**Amazon Elastic Kubernetes Service (EKS)**
+* provisions and scales kuberntes control plane.  
+    * includes 
+        * api servers
+        * backend persistence layer 
+    * across multiple AWS AZs
+* automatically detects and replaces unhealthy control plane nodes and provides patching for the control plane
+* integrated with: 
+    * ELB
+    * IAM
+    * VPC
+    * CloudTrail
+
+**AWS Fargate**
+* Serverless compute engine for containers
+* works with ECS and EKS
+    
 **AWS Secrets Manager**
 * replace hardcoded creds in code with an API call to Secrets Manager
 * can configure to auto rotate secrets for you according to a schedule
@@ -132,14 +227,23 @@
     * infrequent access (ia) - use data accessed less frequently but requires rapid access when needed (long term storage, backups, and data store for DR)
     * intelligent tiering (it) - automatically moves data to the most effective access tier without operational overload
     * glacier - use for archiving    
+* To run simple SQL queries against a subset of data from a specific S3 Object use **S3 Select**
 * Encryption
-    * Server-Side
-        * Managed Encryption (SSE-S3), request must include header: 
-            * x-amz-server-side-encryption
-        * Customer Encryption (SSE-C), request must include headers:
+    * Types: 
+        * Use Server-Side Encryption with Amazon S3-Managed Keys (SSE-S3)
+            * AWS manages both data key and master key.
+            * must include header: x-amz-server-side-encryption
+        * Use Server-Side Encryption with AWS KMS-Managed Keys (SSE-KMS)
+            * AWS manages data key and you manage master key
+            * KMS is the handoff of the MasterKey to the client
+        * Use Server-Side Encryption with Customer-Provided Keys (SSE-C)
+            * You manage both data key and master key 
             * x-amz-server-side​-encryption​-customer-algorithm
             * x-amz-server-side​-encryption​-customer-key
             * x-amz-server-side​-encryption​-customer-key-MD5
+
+**Amazon Athena**
+* Allows you to perform queries against contents of an S3 bucket
 
 **CloudWatch**
 * Monitors CPU, Network, Disk perf, Disk Read/write
@@ -168,6 +272,9 @@
 **Tape Gateway**
 * enables you to replace using physical tapes on-prem with virtual tapes in AWS (S3 standard, glacier, deep archive) w/o changing existing backup workflows.
 
+**Internet Gateway**
+* used to communicate to the internet from a VPC or subnetwork
+
 **AWS DataSync**
 * Simple and Fast to move large amounts of data between on-prem and S3/EFS/FSx
 * use to
@@ -175,6 +282,9 @@
     * transfer data for analysis/processing
     * archive data to free up on-prem storage
     * replicate data to AWS for business continuity
+
+**AWS Glue**
+* Fully managed extract, transform, and load (ETL) service that is used for preparing and loading data for analytics.
 
 **FSx**
 * Fully managed file system for Windows and has AD integration
@@ -190,6 +300,8 @@
 
 **AWS Global Accelerator**
 * Networking service that simplifies traffic mgmt and improves app perf.  
+* Dont use for general HTTP. 
+* Use for UDP(gaming), MQTT (IoT), Voice over IP, or http that specficially require static IP addresses or deterministirc, fast, regional failover
 
 **AWS Resource Access Manager (RAM)**
     * Enables you to securely share AWS resources with any AWS account or within your AWS Organization.  
@@ -201,15 +313,24 @@
     * built on top of AWS Organizations. 
     * Setup environment and set guardrails and use Organizations to create custom policies that control AWS services and resources across multiple AWS accounts.
 
+**Amazon EMR**
+* managed cluster platform that simplifies running big data frameworks (i.e. Hadoop/Spark) on AWS to process and analyze vast amounts of data.
+* can transform and move large amounts of data in/out of other AWS data stores and databases
+* Question Key Words: big data processing frameworks
+
 **RDS**
 * Relational managed database
 * Enhanced Monitoring gives you metrics from the db agent on the instance so it's more accurate thatn CloudWatch.
 * Events are limited to DB Instance events.  
     * **Note** To check for data-modifying events, you need to use native functions or stored procedures.
+* Fails over automatically
+    * When failing over, RDS flips the CNAME of the DB instance to point to the standby RDS instance and then promotes that instance to primary.
 
 **DynamoDB**
 * NoSQL managed database
+* fully managed
 * Stream is enabled, it produces an ordered flow of information about changes to items.
+* DAX - accelerate read performance from milliseconds to microseconds
 
 **Aurora**
     * To load balance reads/writes use custom endpoints.  
@@ -218,11 +339,31 @@
             * Example: So if you have a reporting/help-desk dashboard it could point to the read replicas alone whereas a primary application can point to the writing db
 
 **Amazon Redshift**
-* Spectrum enables you to query and analyze all of your data in S3 using open data formats with no data loading or transformations
+* Used as a data warehouse
+* Spectrum - enables you to query and analyze all of your data in S3 using open data formats with no data loading or transformations
+* Sharding
+    * shard iterator
+        * returned by GetRecords request
+        * expires: 
+            * If Dynamo DB table used by Kinesis does not have capacity to store lease data
+                * can increase write capacity to the shard table to resolve this
+            * 5 minutes 
+            * when you restart your app
+* Question Key Words: big data processing, various BI tools and standard SQL queries
 
-**Amazon Kinesis**
-* Collects, processes, and analyzes streaming data in real time.
-* Kinesis Data Firehose - fully managed service for delivering real-time streaming data
+**Amazon Kinesis Platform**
+* Collects, processes, and analyzes streaming data in real time
+    * uses DynamoDB to store data as it streams
+* Kinesis Connector - 
+* Kinesis Data Streams - an application that you use to collect and process larges steamd of data records in real time. 
+    * use Kinesis client library
+    * runs on EC2
+* Kinesis Data Firehose - fully managed service for delivering real-time streaming data to S3, Redshift, OpenSearch Service, Splunk, custom http endpoint   
+    * can transform data before sending it 
+* Kinesis Video Streams - fully managed service to stream live video from devices to AWS or build apps for real-time video processing or video Analytics
+    * can store mediate data for a specified retention period (default encrypted at rest)
+* Kinesis Data Analytics - allows you to run SQL against streaming data to perform time-series analytics, feed real-time dashboards, create real-time metrics
+    * uses kensis data streams and kinesis firehose as streaming sources
 
 **Redis**
 * Use as a distributed session management.  
@@ -237,10 +378,11 @@
 
 **Security Groups**
 * Control Traffic to EC2 instances
+* VPC can only be secured via Security Groups
 * Security groups only have inbound rules.  
     * All inbound rules are duplicated for outbound (if you allow incoming on port 80 then it auto allows outgoing on port 80)
 
-**NACL**
+**Network ACL (NACL)**
 * NACLs control traffic to VPC subnets.  
 * NACL has both inbound and outbound rules.
 
@@ -248,6 +390,11 @@
     * All support messaging 
     * Use SQS/SNS if its a new application
     * Use MQ if migrating an existing on-prem messaging platform that uses standard protocols
+
+**SQS**
+* used as a queue for messaging
+* max retention day for messages is 14 days
+* can contain unlimited number of messages
 
 **SES**
 * Use for notification and transactional emails
@@ -259,4 +406,66 @@
 **Notes**
 * SSH uses TCP over port 22
 
+**VPC**
+* Enable access to network from VPC
+    * Attach virtual private Gateway to VPC
+    * create a custom route table
+    * update security group rules allowing traffic
+    * create AWS managed VPN connection (VPN here means connection between VPC and client network)
+        * To create a VPN connection, need to create a **Customer Gateway Resource** in AWS.
+* Endpoint - allows private connection between VPC and AWS services and other VPC encpoints (for other VPC comm, it uses AWS PrivateLink)
+    * Can create endpoint policy to control access to the service that the endpoint is connecting to
+* Subnet - range of IP Addresses 
+    * Must specify a range of IPv4 addresses in CIDR notation
+    * Can optionally add IPv6 addresses range
+    * DualStack Mode is where your resources can communicate over IPv4, IPv6, or both but not IPv6 exclusively.
+* Peered connections are NOT pass through connections.  
+    * If VPC A and VPC B are peered and VPC A has access to a VPN that connects it to a corporate network.  THat does NOT mean that VPC B can access that corp network. 
+* **Note** IPv6 addresses are public and reachable over the internet generally.  IPv4 addresses are NOT.  So you can associate a IPv6 block with VPC and subnets if you want them to be publicly accessible
 
+**AWS Config**
+* enables you to assess, audit, and evaluate configs of your AWS resources.  
+* continuiously monitors and records your AWS resource configs 
+
+**AWS Trusted Advisor**
+* provides best practice recommendations
+
+**AWS OpsWorks**
+* Configuration management service that provides managed instances of Chef and Puppet.  
+* Lets chef/puppet automate how servers are configured, deployed, managed across EC2 instances and on-prem compute environments.
+
+**AWS Beanstalk**
+* handles application deployment details (capacity provisioning, load balancing, auto scaling, app health monitoring)
+
+**AWS CloudFormation**
+* lets you create a collection of related AWS resources andprovision them in a predictable fashion using infrastructure as code.
+
+**Amazon Simple Workflow Service (SWF)**
+* fully managed state tracker and task coordinator.
+* is a web service
+* used to build applications that use AWS to coordinate 
+
+**AWS Security Token Service (STS)**
+* allows you to create and provide trusted users with temp security creds that can control access to your AWS resources
+
+**AWS Cognito**
+* used for user authentication 
+
+**AWS SSO**
+* cloud SSO taht centrally manages SSO access to multiple AWS accounts and business applications
+* uses STS
+
+**Data Transfer Options**
+* Snowball - if it takes more than one week to upload your data to AWS then use Snowball.
+    * if you need secure and quick transfer of terabytes to many petabytes from on-prem to AWS.
+    * if you dont want to make expensive upgrades to your network
+    * if you frequeently experience large backlogs of data
+    * if youre located in a physically isolated environment
+    * if you dont have high speed internet
+* Snowball Edge - can undertake local processing and edge-computing workloads in addition to what's available in regular Snowball. 
+* Snowmobile - if you need to move EXTREMELY large amounts of data (up to 100 Petabytes of data)
+
+**Bastion Host**
+* EC2 on a network specifically designed and configured to withstand attacks
+* should be in public subnet with either a public/elastic IP address 
+* should be configured to have RDP or SSH access defined in the security group for the subnet it's in. 
