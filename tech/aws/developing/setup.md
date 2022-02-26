@@ -1,0 +1,2 @@
+Install AWS CLI: msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi
+Install CoPilot: New-Item -Path 'C:\copilot' -ItemType directory; `Invoke-WebRequest -OutFile 'C:\copilot\copilot.exe' https://github.com/aws/copilot-cli/releases/latest/download/copilot-windows.exe

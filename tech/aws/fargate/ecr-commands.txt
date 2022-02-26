@@ -1,0 +1,144 @@
+**Push to AWS ECR (runs in default aws cli proflie)**
+* cd forms/va-rideshare-public-form
+* ensure that repository in ECR is created with the SAME app name used on the image (in this case varidespublicform:latest)
+* login to ecr => aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 226104853714.dkr.ecr.us-east-1.amazonaws.com
+* build the image => docker build -t varidespublicform .
+* tag the image => docker tag varidespublicform:latest 226104853714.dkr.ecr.us-east-1.amazonaws.com/varidespublicform:latest
+* push the image => docker push 226104853714.dkr.ecr.us-east-1.amazonaws.com/varidespublicform:latest
+
+always want the vm and each vm's container to be blocked off from direct internet access
+you create a gateway or load balancer that is available to the public that redirects requests to the container so that way only the gateway/balancer is exposed ot the internet
+
+
+(setting up network)[https://youtu.be/aa3gGwJpCro]: 
+go to vpc => create vpc 
+    * name: varides_publicform_vpc
+    * cidr: 10.0.0.0/16
+
+create two subnets (two public two private) for the vpc
+    go to subnets => create subnet public
+        * name: varides_publicform_public-01
+        * vpc: varides_publicform_vpc
+        * az: us-east-1
+        * CIDR block: 10.0.1.0/24
+    go to subnets => create subnet public
+        * name: varides_publicform_public-02
+        * vpc: varides_publicform_vpc
+        * az: us-east-2
+        * CIDR block: 10.0.2.0/24
+    go to subnets => create subnet private 
+        * name: varides_publicform_private-01
+        * vpc: varides_publicform_vpc
+        * az: us-east-1
+        * CIDR block: 10.0.3.0/24
+    go to subnets => create subnet private
+        * name: varides_publicform_private-02
+        * vpc: varides_publicform_vpc
+        * az: us-east-2
+        * CIDR block: 10.0.4.0/24
+
+Add NAT Gateway to public subnet (allows resources in private subnet to access internet while still keeping incoming traffic blocked)
+    * VPC => NAT Gateway => Add NAT Gateway
+    * Subnet: varides_publicform_public-01
+    * Create new EIP
+    * Create NAT Gateway
+    * Edit Route Table => select private route table
+        * subnet association (should see both private subnets)
+        * click routes tab => edit routes
+        * 0.0.0.0/0 - <NAT Gateway id just created> => Save Routes
+
+create internet gateway
+    * name: varides_publicform_igw
+    * attach to vpc varides_publicform_vpc
+
+create route table for public traffic
+    * varides_publicform_public_rt
+    * vpc: varides_publicform_vpc
+    * add route for traffic that isnt from network: 
+        * 0.0.0.0 => varides_publicform_igw
+     * add subnet associations
+        * add both public subnets
+
+create route table for private traffic
+    * varides_publicform_public_rt
+    * vpc: varides_publicform_vpc
+    * add subnet associations
+        * add both private subnets
+
+create cluster
+    * fargate
+    * name: varides_publicform_cluster
+    * create vpc  (accept defaults)
+    * enable insights
+
+create task defintion
+    * fargate
+    * name: varides_publicform_taskdef
+    * task role: none
+        * only need a task role if the container is accessing other aws services.  
+    * task execution IAM role: Create New role
+    * add container defintion
+        * name: varides_publicform_container
+        * image: 226104853714.dkr.ecr.us-east-1.amazonaws.com/varidespublicform:latest
+        * port mappings: 3000
+        * add environment variables
+    * create
+
+create services
+    * fargate
+    * task definition: varides_publicform_taskdef
+    * cluster: varides_publicform_cluster
+    * name: varides_publicform_service
+    * # of tasks: 2
+    * health check grace period: 30
+    * cluster vpc: select vpc id of varides_publicform_vpc
+    * subnets: select both private subnets created above
+    * security group edit: 
+        * create new security group
+        * name: varides_publicform_sg
+        * **Note** Need to update the inbound rules for the security group so that only traffic from the load balancer comes in.  will do this later when we create the load balancer.
+        * load balancing: application load balancer 
+            * create application load balancer: 
+                * configure load balancer
+                    * name: varides_publicform_alb
+                    * listener: http port 80 (should be there by default, add it if not)
+                    * vpc: varides_publicform_vpc
+                    * az: pick both w/ each public subnet
+                * configure security settings (accept defaults)
+                * configure security groups
+                    * create new security group
+                    * name: varides_publicform_alb_sg
+                    * http:80:0.0.0.0/0
+                * configure routing (any request to a load balancer will get sent to a target group)
+                    * new target group 
+                    * name: varides_publicform_tg
+                    * target type: ip
+                        * the ECS service will create tasks within our VPC.  It will use specific IP addresses within our private subnet and it will allocate IP addresses to those containers
+                    * protocol: http
+                    * port: 80
+                    * safecheck: /health
+                * register targets
+                    * keep deaults because we want to keep IPs dynamic and dictated by the load balancer
+                * create
+            * set load balancer name: varides_publicform_alb
+            * Container name | port:  varides_publicform_container:3000:3000 => add to load balancer
+                * listener port: 80:http
+                * target group name: varides_publicform_tg
+            * no auto scaling
+    * create service
+
+update inbound rules for service's security group to allow inbound traffic from alb
+    * click on service => edit => next step => click on security group (can also go to security group directly)
+    * get security group id tied to alb (go to load balancers => in details get security group id)
+    * update inbound rules to allow only load balancer traffic to access 
+        * click inbound rules => edit rules => All TCP:AllPorts:<load balancer security group id>
+    * verify by going to load balancer => listeners tab. Should see traffic from http: 80 going to ecs target group => click on target group => targets tab => verify that everything is healthy
+
+* go to load balancer window => copy dns name => look at it in the browser
+
+* code pipeline (https://youtu.be/aa3gGwJpCro?t=2694)
+    * create pipeline
+        * name: 
+
+
+
