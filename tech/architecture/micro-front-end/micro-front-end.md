@@ -3,9 +3,9 @@
 ## Traditional Architecture
 ```mermaid
     graph TD;
-        Store App --> Product Display;
-        Store App --> Checkout;
-        Store App --> Product Search;
+        Store-App-->Product-Display;
+        Store-App-->Checkout;
+        Store-App-->Product-Search;
 ```
 
 ## Benefits
