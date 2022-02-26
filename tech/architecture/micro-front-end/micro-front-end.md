@@ -4,7 +4,7 @@
 In a traditional monolithic frontend architecture, component trees are used 
 ```mermaid
     graph TD;
-        Store-App-->[n]-components;
+        Store-App-->n-components;
 ```
 
 ---
