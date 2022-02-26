@@ -4,7 +4,7 @@
 In a traditional monolithic frontend architecture, component trees are used to segment responsibility of work.  These component architectures 
 ```mermaid
     graph TD;
-        Store-App-->n-components;
+        Store-App-->store-app-components;
 ```
 
 ---
@@ -12,11 +12,11 @@ In a traditional monolithic frontend architecture, component trees are used to s
 ```mermaid
     graph TD;
         Store-App-->Product-Display;
-        Product-Display-->n-components;
+        Product-Display-->product-display-components;
         Store-App-->Checkout;
-        Checkout-->n-components;
+        Checkout-->checkout-components;
         Store-App-->Product-Search;
-        Product-Search-->n-components;
+        Product-Search-->product-search-components;
 ```
 
 ## Benefits
