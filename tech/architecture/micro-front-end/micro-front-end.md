@@ -11,12 +11,12 @@ In a traditional monolithic frontend architecture, component trees are used to s
 **Equivalent Micro FrontEnd Architecture**
 ```mermaid
     graph TD;
-        Store-App-->Product-Display;
-        Product-Display-->product-display-components;
-        Store-App-->Checkout;
-        Checkout-->checkout-components;
-        Store-App-->Product-Search;
-        Product-Search-->product-search-components;
+        Store-App-->Product-Display-MFE;
+        Product-Display-MFE-->product-display-components;
+        Store-App-->Checkout-MFE;
+        Checkout-MFE-->checkout-components;
+        Store-App-->Product-Search-MFE;
+        Product-Search-MFE-->product-search-components;
 ```
 
 ## Benefits
