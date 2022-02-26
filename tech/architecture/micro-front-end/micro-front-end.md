@@ -29,6 +29,13 @@ As you can see, there is one application and that application is broken down int
 In micro front end architecture component trees are broken out into their own silos to be maintained and iterated on semi-independently of the product as a whole.  So the monlith above can be re-configured into three different applications: 
 ```mermaid
     graph TD;
+        Store-App-->Product-Display-MFE;
+        Store-App-->Checkout-Component-MFE;
+        Store-App-->Product-Search-Component-MFE;
+```
+
+```mermaid
+    graph TD;
         Product-Display-MFE-->Product-Card-Component;
         Product-Card-Component-->Price-Component;
         Product-Card-Component-->Image-Preview-Component;
