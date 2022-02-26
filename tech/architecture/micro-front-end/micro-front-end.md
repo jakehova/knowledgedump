@@ -33,7 +33,7 @@ In micro front end architecture component trees are broken out into their own si
         Store-App-->Checkout-Component-MFE;
         Store-App-->Product-Search-Component-MFE;
 ```
-
+---
 ```mermaid
     graph TD;
         Product-Display-MFE-->Product-Card-Component;
@@ -55,7 +55,7 @@ In micro front end architecture component trees are broken out into their own si
         Product-Search-Component-MFE-->Product-Search-Result-ListBox;
         Product-Search-Component-MFE-->Product-Search-Result-ListItem;
 ```
-
+---
 ## Benefits
 *  Faster Development (for larger projects)
 *  Deployment Independence
