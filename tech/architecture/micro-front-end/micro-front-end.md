@@ -1,5 +1,6 @@
 # Micro FrontEnd Architecture
 
+# What
 ## Component Architecture
 When building a front end application in javascript, it is important to encapsulate code within code blocks of single responsibility.  While this is a generally known coding principle, it is incredibly important in a dynamically typed language like javascript.  Having code that is tied to a single responsibility makes it much easier to write both unit and integration tests. The more tests, the more reliable the code.  In modern Javascript frameworks this single responsiblity ends up being a foundational principle in how the frameworks are structured.  The encapsulated code block is called a "component" and both React and Angular use "component hierarchies" to manage development.  Building a front end using components and component hierarchies makes the code base a lot more manageable and testable.
 
@@ -26,12 +27,12 @@ In a monolithic frontend architecture (not to be confused with a mono repo which
 As you can see, there is one application and that application is broken down into different trees of components.  The leaf nodes of the tree being the most basic components of that tree.  Parent nodes have a responsibility to coordinate communication of data to its child nodes and to pass events from its child nodes, further up the tree.
 
 ## Equivalent Micro FrontEnd Architecture
-In micro front end architecture component trees are broken out into their own silos to be maintained and iterated on semi-independently of the product as a whole.  So the monlith above can be re-configured into three different applications: 
+In micro front end architecture component trees are broken out into their own silos to be maintained and iterated on independently of the product as a whole.  So the monlith above can be re-configured into three different applications: 
 ```mermaid
     graph TD;
         Product-Display-MFE-->Store-App;
-        Checkout-Component-MFE-->Store-App;
-        Product-Search-Component-MFE-->Store-App;
+        Checkout-MFE-->Store-App;
+        Product-Search-MFE-->Store-App;
 ```
 ---
 ```mermaid
@@ -44,16 +45,16 @@ In micro front end architecture component trees are broken out into their own si
 
 ```mermaid
     graph TD;
-        Checkout-Component-MFE-->Cart-Component;
-        Checkout-Component-MFE-->Cart-Item-Component;
-        Checkout-Component-MFE-->Calculated-Total-Component;
+        Checkout-MFE-->Cart-Component;
+        Checkout-MFE-->Cart-Item-Component;
+        Checkout-MFE-->Calculated-Total-Component;
 ```
 
 ```mermaid
     graph TD;
-        Product-Search-Component-MFE-->Product-Search-TextBox;
-        Product-Search-Component-MFE-->Product-Search-Result-ListBox;
-        Product-Search-Component-MFE-->Product-Search-Result-ListItem;
+        Product-Search-MFE-->Product-Search-TextBox;
+        Product-Search-MFE-->Product-Search-Result-ListBox;
+        Product-Search-MFE-->Product-Search-Result-ListItem;
 ```
 ---
 
@@ -63,15 +64,19 @@ In micro front end architecture component trees are broken out into their own si
 Teams can be assigned to each micro front end and work independently of each other.  This allows for independent deployment cycles and independent iteration cycles.  So Product-Search could release new features/bug fixes without coordinating with Checkout or Product Display MFEs.  Front end state management libraries could be leveraged to manage all communication to/from the MFE so any dependence on data from another MFE can largely be abstracted away from the front end code of the MFE itself. 
 
 *  Smaller and Focused Codebases
+
 There is an obvious functionality focus for each MFE, so each MFE's codebase is limited to code aligned with it's output goal.  
 
 *  Simplified Testing
 
+Smaller and more focused codebase leads to simplified testing. 
 
 * Lower FCP and FMP values
-In addition, from a user perspective, only the front ends that are used need to be loaded in the browser.  So in the marketplace example, we can decrease our time to first contentful paint and first meaningful paint because we are providing a lot less code to the browser for parsing and processing.
+
+Only the MFEs that are used need to be loaded in the browser.  So in the marketplace example, we can load ONLY the Product-Display-MFE when the user first visits the site.  This will drastically reduce time to first contentful paint and first meaningful paint by NOT loading the Checkout or Product Search Apps.  We can then dynamically load the Checkout-MFE and Product-Search-MFE when they are requested by user interaction with the app. This means we are providing a lot less code to the browser for parsing and processing initially and also dynamically providing waht the browser needs as the user interacts with the app.
 
 ## Key Implementation Concepts
+* Each MFE should be feature focused
 * Each MFE can be technology independent and should be built independently of the other MFEs
 * Do not rely on shared or global state
 * Use MFE prefixes for components/namespaces/local storage vars/events/cookies to ensure no conflict and to ease testing/maintenance
@@ -92,3 +97,48 @@ In addition, from a user perspective, only the front ends that are used need to 
 * Larger Payloads
     * Since each team is essentially working in a silo, there is a chance for code duplication or handling similar problems in different ways.  This is not necessarily a bad thing as long as the user experience does not suffer from these inconsistentices.  What CAN occur is the duplicative code leads to code glut and payload sizes for each front end 
 
+# How
+## Module Federation
+The Module Federation architectural pattern is used to share code and dependencies between two or more different application codebases.  The underlying principle of the pattern is to have a host application that dynamically loads code or dependencies as they are needed.  
+
+## Tools
+* [Webpack 5 Module Federation](https://webpack.js.org/concepts/module-federation/) and [WebPack 5 ModuleFederationPlugin](https://webpack.js.org/plugins/module-federation-plugin/)
+* [Open Components](https://opencomponents.github.io/)
+
+## Webpack Configuration
+I looked at a few tools that are available.  Most seem like they were initial attempts at handling module federation.  Webpack 5 seemed like the easiest way to implement/manage it.
+
+Each individual MFE would have a webpack.config.js file that describes what components are exported, which applications are imported:
+
+```
+plugins: [
+    new ModuleFederationPlugin({
+      name: "<Name of this MFE and how it will be referred to in MFE's that import it>",
+      remotes: {
+        <Name of MFE you are importing>: "<Name of MFE you are importing>@<URL of MFE you are importing>/remoteEntry.js"
+      },
+      exposes: {
+          "<Component Name>":"<relative filepath location of component>"
+      },
+      shared: {
+          // libraries that will be shared with other MFEs that are consuming or interacting with this MFE.  Format is <packageName>: {<package hints>}.  Example:
+          react: {
+              requiredVersion: deps.react, // require any MFE consuming this MFE to have the react dependencies included 
+              singleton: true              // dont allow multiple versions of react to run in parallel, load once and reuse it
+          },
+          lodash: {
+              requiredVersion: "^4.17.0"
+          }
+      }
+    }),
+    new HtmlWebPackPlugin({
+      template: "./src/index.html",
+    }),
+  ],
+```
+
+# Communication between MFEs
+As mentioned above, it is best practice to use web platfrom native messaging apis to handle communication rather than framework specific or custom methods.  As such, the two platform methods I think would be best are: 
+
+*  windowed observables
+*  web workers
