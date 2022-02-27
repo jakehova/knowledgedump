@@ -56,8 +56,38 @@ In micro front end architecture component trees are broken out into their own si
         Product-Search-Component-MFE-->Product-Search-Result-ListItem;
 ```
 ---
-## Benefits
-*  Faster Development (for larger projects)
-*  Deployment Independence
-*  Smaller Codebases
+
+## Benefits of Micro FrontEnd Architecture
+*  Faster Development (for larger projects) & Deployment Independence
+Teams can be assigned to each micro front end and work independently of each other.  This allows for independent deployment cycles and independent iteration cycles.  So Product-Search could release new features/bug fixes without coordinating with Checkout or Product Display MFEs.  Front end state management libraries could be leveraged to manage all communication to/from the MFE so any dependence on data from another MFE can largely be abstracted away from the front end code of the MFE itself. 
+
+*  Smaller and Focused Codebases
+There is an obvious functionality focus for each MFE, so each MFE's codebase is limited to code aligned with it's output goal.  
+
 *  Simplified Testing
+
+
+* Lower FCP and FMP values
+In addition, from a user perspective, only the front ends that are used need to be loaded in the browser.  So in the marketplace example, we can decrease our time to first contentful paint and first meaningful paint because we are providing a lot less code to the browser for parsing and processing.
+
+## Key Implementation Concepts
+* Each MFE can be technology independent and should be built independently of the other MFEs
+* Do not rely on shared or global state
+* Use MFE prefixes for components/namespaces/local storage vars/events/cookies to ensure no conflict and to ease testing/maintenance
+* Use native browser platform for communication between MFEs (i.e. instead of using a custom pub/sub system use browser's native messaging apis), not custom apis or passing values directly to MFEs.  
+
+## Challenges
+* Inconsistent user experience.  
+    * With multiple teams working independently on a single solution, it can be easy for multiple teams to implement a similar feature in different ways.
+    * Mitigate by:
+        * Have a central UI/UX team that creates guidelines for all teams to follow
+        * Have framework specific repos for common assets (framework wrapped textbox, drop down, calendar, etc) that that has UI testing that tests for adherence to UX guideleines laid out by the organization.
+* Poor communication between MFEs
+    * Similar to API maintenance and versionining issues that teams have experienced when swithcing to a micro service architecture, the same issue applies here.  When an MFE is documented to accept a specific message/content and is updated to break that contract, then 
+    * Mitigate by: 
+        * Clearly documenting messaging api support for outgoing and incoming messages.
+        * Have integration tests built that test messaging events
+        * Have a deprecation strategy for messaging events
+* Larger Payloads
+    * Since each team is essentially working in a silo, there is a chance for code duplication or handling similar problems in different ways.  This is not necessarily a bad thing as long as the user experience does not suffer from these inconsistentices.  What CAN occur is the duplicative code leads to code glut and payload sizes for each front end 
+
