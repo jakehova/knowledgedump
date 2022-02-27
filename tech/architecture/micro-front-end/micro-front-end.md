@@ -140,5 +140,65 @@ plugins: [
 # Communication between MFEs
 As mentioned above, it is best practice to use web platfrom native messaging apis to handle communication rather than framework specific or custom methods.  As such, the two platform methods I think would be best are: 
 
-*  windowed observables
-*  web workers
+## Windowed Observables 
+This would leverage a library like RxJS that handles an observable pattern for you.  Implementation of the pub/sub system would be configured at the MFE level and individual MFEs would subscribe to the changes accordingly.
+
+```
+// MFE 1
+import { Observable } from 'rxjs';
+const $cartItemsObservable = new Observable(subscriber => {
+    subscriber.next({action:'increment', quantity: 1});
+});
+```
+
+```
+// MFE 2
+import { $cartItemsObservable } from 'MFE1/Observables';
+
+$cartItemsObservable.subscribe(payload => {
+    alert(`{payload.quantity} item has been added to your cart`);
+})
+```
+
+The observables would be configured as exports/imports via webpack.config.js ModuleFederationPlugin.
+
+## Web Workers
+
+Generate a web worker in the container app.  This web worker would be a simple transport of messages that individual MFEs would deconstruct from the window object of the browser platform.  From there, each individual MFE could post messages that other MFEs could listen for and react to accordingly.
+
+```
+// web worker in container app (saved in a file named "messenger.js")
+export function messenger(message){
+    postMessage(message);
+}
+```
+
+```
+// container app 
+import messenger from 'messenger';
+window.messengerBus = messenger;
+```
+
+```
+// MFE
+const { messengerBus } = window;
+
+function App() {
+    const [message, setMessage] = useState();
+
+ const handleIncomingMessage = (incomingMessage) => {
+    if (incomingMessage.data.type) {
+      return;
+    }
+    setMessage(incomingMessage.data);
+  };
+
+  useEffect(() => {
+    messengerBus.addEventListener('message', handleIncomingMessage);
+
+    return () => {
+      messengerBus.removeEventListener('message', handleIncomingMessage)
+    }
+  }, [handleIncomingMessage]);
+}
+```
