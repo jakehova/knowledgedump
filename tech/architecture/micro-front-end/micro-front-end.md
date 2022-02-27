@@ -59,6 +59,7 @@ In micro front end architecture component trees are broken out into their own si
 
 ## Benefits of Micro FrontEnd Architecture
 *  Faster Development (for larger projects) & Deployment Independence
+
 Teams can be assigned to each micro front end and work independently of each other.  This allows for independent deployment cycles and independent iteration cycles.  So Product-Search could release new features/bug fixes without coordinating with Checkout or Product Display MFEs.  Front end state management libraries could be leveraged to manage all communication to/from the MFE so any dependence on data from another MFE can largely be abstracted away from the front end code of the MFE itself. 
 
 *  Smaller and Focused Codebases
