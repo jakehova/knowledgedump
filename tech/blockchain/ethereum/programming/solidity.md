@@ -285,7 +285,7 @@ function fiveMinutesHavePassed() public view returns (bool) {
   return (now >= (lastUpdated + 5 minutes));
 }
 ```
-
+* selfdestruct(<owner address>) - removes code from the blockchain - any remaining Ether in the contract is sent to a designated target
 
 ## Inheritance
 * A contract can include code from another contract by using inheritance.  
