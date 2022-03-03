@@ -38,6 +38,9 @@
     Topic1-->JoinApp
     Topic2-->JoinApp
     end
+    subgraph notify
+    Topic2-->notify_process
+    end
 ```
 
 ## Core components
