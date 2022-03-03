@@ -18,4 +18,5 @@
         * (Optional) - Enter a user identifier
         * Get Device ARN
     * Publish Message to ARN
-        * To send 
+        * To send push notification to EVERY user that uses the app, send an SNS message to the Platform ARN
+        * To send push notification to INDIVIDUAL user that uses the app, send an SNS to Device ARN
