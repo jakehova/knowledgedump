@@ -1,5 +1,36 @@
 # Exam Notes
 
+## Questions to ask for anyquestion in the exam
+* Can it be cached
+* What kind of cache should be used? (i.e if its a DB, then Redis/Memcache/DAX if its a web request then Cloud Front, IP caching mea)
+* How does the content get updated? (TTL usually)
+* Does it add anything besides speed? (with cloudfront it adds security and high availablity and speed)
+
+# Solution Architect Exam Notes
+- A region is a physical location in the world that consists of 2 or more AZs
+- An AZ is one more discrete data center house in separte facilities each with redundant power, netowrking, and connectivity
+- AN Edge Lcoation endpoints for AWS used for caching content.  Usually consists of CloudFront.
+- (Well Architected Framework)[https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html?did=wp_card&trk=wp_card]
+- Shared Responsibility Model - You are responsible for Security IN the cloud (customer data, authorization/authentication, encryption, etc) and AWS is responsible for Security OF the cloud (hardware, software)
+- Key Services to Know: 
+    - Compute: EC2, Lambda, Elastic Beanstalk
+    - Networking: VPC, Direct Connect, Route 53, API Gateway, AWS Global Accelerator
+    - Storage: S3, EBS (Elastic Block Store), EFS (Elastic File Service), FSx, Storage Gateway
+    - Databases: RDS, DynamoDB, Redshift 
+- Securing Root Account: 
+    - Enable MFA
+    - Create an Admin Group for your admins and assign the appropriate permissions to that group
+    - Create user accounts for admins
+    - Add users to the admin group
+- You control access to AWS via IAM which uses Policy Documents (JSON)
+- IAM is global; it does not apply to regions.
+- The root account should be locked down immediately and never used for day to day activities.  Should then create an admin group and add user accounts to that. 
+- Access Key ID and secret Access Keys are not the same as username and passwords; they are for programmatic console access.  They cannot be used to log in to the console.
+- IAM Federation is used to combine your existing user account mgmt platform (usually Active Directory) with AWS via SAML standard (SAML Standard is Active Directory)
+
+Key Words: 
+File Storage means likely not S3.  Maybe EFS or FSx
+
 **OSI Model**
 * conceptual framework used to describe functions of a networking system.
 * 7 layers: 
@@ -19,6 +50,7 @@
 
 **EC2**
 * During Scale-In, default termination policy is to remove the instance with the oldest configuration. 
+* Nitro EC2 instances are the newest versions and can do 64k for a provisioned IOPS SSD.  Other versions can only do up to 32k
 * Storage Comparison:
     * SSD - Small & Random I/O ops, can be bootable, best for transactional workloads, critical apps that require sustained IOPS, large db workloads.  
         * General Purpose - boot volumes, virtual desktops, most workloads
@@ -216,6 +248,19 @@
 **AWS KMS**
 * used to manage encryption keys and control use of encryption across AWS services.
 * client gives key to AWS to do encryption.
+
+**AWS CloudHSM**
+* managed hardware security module
+* allows you to generate and use your own encryption keys
+* Keywords: 
+    * when you need full control over the encryption of the created key (so not owned or managed by AWS)
+    * when you need to audit key usage independently of AWS CloudTrail
+* **Note** each custom key store is a ssoicated with an AWS CloudHSM cluster in your AWS account
+* Key use cases:
+    * You might have keys that are explicitly required to be protected in a single-tenant HSM or in an HSM over which you have direct control.
+    * You might have keys that are required to be stored in an HSM that has been validated to FIPS 140-2 level 3 overall (the HSMs used in the standard AWS KMS key store are either validated or in the process of being validated to level 2 with level 3 in multiple categories).
+    * You might need the ability to immediately remove key material from AWS KMS and to prove you have done so by independent means.
+    * You might have a requirement to be able to audit all use of your keys independently of AWS KMS or AWS CloudTrail. 
 
 **S3**
 * Can only add 1 SQS or SNS at a time to S3 events
