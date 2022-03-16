@@ -22,34 +22,12 @@
         * Connector API - allows you to add applications or data systems to push/pull data to/from kafka
 
 ```mermaid
-<<<<<<< HEAD
     graph TD;
         Producer_API-->Kafka_Broker
         Kafka_Broker-->Consumer_API
         Connector_Input_via_API-->Kafka_Broker
         Kafka_Broker-->Connector_Output_via_API
         Kafka_Broker<-->Streaming_Engine
-=======
-    flowchart LR
-    Producer-->Broker
-    subgraph kafka
-    Broker-->Log
-    Log-->Topic1
-    Topic2
-    end
-    Consumer-->Topic1
-    subgraph kStream
-    Topic1-->JavaApp
-    JavaApp-->Topic2
-    end
-    subgraph join
-    Topic1-->JoinApp
-    Topic2-->JoinApp
-    end
-    subgraph notify
-    Topic2-->notify_process
-    end
->>>>>>> 1b82484e1a39f267107fd903cf95c2c028041974
 ```
 
 ## Core components
@@ -106,9 +84,9 @@
         * can do inner, outer, left-outer
 
 ## Example Usage
-* A systems acts as a producer and sends a record to a Kafka Broker
-* Kafka Broker is examined and written to a log that corresponds with one or more topics
-* The record is published to a topic endpoint and available for Consumption
+* A systems acts as a producer and sends a **Record** to a Kafka Broker
+* **Record** is examined and written to a log/segment that corresponds with one or more topics
+* The **Record** is published to a topic endpoint and available for Consumption
 * Consumption occurs by any number of consumers.  Consumers are created via:
     * Consumption API
     * kStream
