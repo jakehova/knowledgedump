@@ -22,12 +22,34 @@
         * Connector API - allows you to add applications or data systems to push/pull data to/from kafka
 
 ```mermaid
+<<<<<<< HEAD
     graph TD;
         Producer_API-->Kafka_Broker
         Kafka_Broker-->Consumer_API
         Connector_Input_via_API-->Kafka_Broker
         Kafka_Broker-->Connector_Output_via_API
         Kafka_Broker<-->Streaming_Engine
+=======
+    flowchart LR
+    Producer-->Broker
+    subgraph kafka
+    Broker-->Log
+    Log-->Topic1
+    Topic2
+    end
+    Consumer-->Topic1
+    subgraph kStream
+    Topic1-->JavaApp
+    JavaApp-->Topic2
+    end
+    subgraph join
+    Topic1-->JoinApp
+    Topic2-->JoinApp
+    end
+    subgraph notify
+    Topic2-->notify_process
+    end
+>>>>>>> 1b82484e1a39f267107fd903cf95c2c028041974
 ```
 
 ## Core components
