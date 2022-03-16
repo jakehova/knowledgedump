@@ -12,32 +12,22 @@
         * Each Log has one or more Segment(s)
         * A segment is created for each subscriber to a log
 
-```mermaid
-    graph TD;
-        Producer-->Kafka
-        Kafka-->Consumer
-        Connector_Mongo-->Kafka
-        Kafka-->Connector_BigQuery
-        Kafka<-->Streaming_Engine
-```
+* Kafka Server: 
+    * Kafka Brokers (servers that manage writing/reading from logs)
+    * Kafka APIs: 
+        * Producer API - gets data into Kafka.  publishes data to a Kafka Topic
+        * Consumer API - gets data out of Kafka. subscribes to topic(s) and gets sent data as it arrives at a topic
+            * Request asks for a topic and an offset (offset says which record in the log do you want to return data from)
+        * Streams API - used to receive data from a topic, transform it in some way, and output it to a different topic.  For example, if you subscribe to the "login_attempt" topic, you could take that login attempt, supplement it with an application name and then push the new message to a different topic that some other applications are subscribed to via consumer api.   
+        * Connector API - allows you to add applications or data systems to push/pull data to/from kafka
 
 ```mermaid
-    flowchart LR
-    Producer-->Broker
-    subgraph kafka
-    Broker-->Log
-    Log-->Topic1
-    Topic2
-    end
-    Consumer-->Topic1
-    subgraph kStream
-    Topic1-->JavaApp
-    JavaApp-->Topic2
-    end
-    subgraph join
-    Topic1-->JoinApp
-    Topic2-->JoinApp
-    end
+    graph TD;
+        Producer_API-->Kafka_Broker
+        Kafka_Broker-->Consumer_API
+        Connector_Input_via_API-->Kafka_Broker
+        Kafka_Broker-->Connector_Output_via_API
+        Kafka_Broker<-->Streaming_Engine
 ```
 
 ## Core components
@@ -74,12 +64,6 @@
     * kStreams forward EVERY event.  kTables only forward events when "commit interval" expires OR when cache size is exceeded.
 * global kTable - same as kTable but stores ALL records across ALL partitions
     * used for smaller datasets that dont change much (i.e zip codes/country codes/etc)
-* APIs
-    * Producer API - gets data into Kafka.  publishes data to a Kafka Topic
-    * Consumer API - gets data out of Kafka. subscribes to topic(s) and gets sent data as it arrives at a topic
-        * Request asks for a topic and an offset (offset says which record in the log do you want to return data from)
-    * Streams API - used to receive data from a topic, transform it in some way, and output it to a different topic.  For example, if you subscribe to the "login_attempt" topic, you could take that login attempt, supplement it with an application name and then push the new message to a different topic that some other applications are subscribed to via consumer api.   
-    * Connector API - allows you to add applications or data systems to push/pull data to/from kafka
 
 ## JOINS
 * allows you to join two streams/tables together to create a single kStream or kTable
@@ -98,6 +82,35 @@
         * can do inner, left-outer (can only use if kStream is on left side)
     * table-table: joins two tables
         * can do inner, outer, left-outer
+
+## Example Usage
+* A systems acts as a producer and sends a record to a Kafka Broker
+* Kafka Broker is examined and written to a log that corresponds with one or more topics
+* The record is published to a topic endpoint and available for Consumption
+* Consumption occurs by any number of consumers.  Consumers are created via:
+    * Consumption API
+    * kStream
+    * kTable
+    * join 
+    
+```mermaid
+    flowchart LR
+    Producer-->Broker
+    subgraph kafka
+    Broker-->Log
+    Log-->Topic1
+    Topic2
+    end
+    Consumer-->Topic1
+    subgraph kStream
+    Topic1-->JavaApp
+    JavaApp-->Topic2
+    end
+    subgraph join
+    Topic1-->JoinApp
+    Topic2-->JoinApp
+    end
+```
 
 ## Sample Code
 ### JOIN 
