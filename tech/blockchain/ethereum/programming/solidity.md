@@ -63,3 +63,7 @@ contract("Election", function(accounts){
     })
 }) ;
 ```
+**Deploying a Contract to Local Ganache** 
+* Open Remix and paste in contract, compile it
+* In console run: geth --http --http.corsdomain https://remix.ethereum.org command to start geth connection to remix
+* In Remix, go to publish and select Web3Provider, select contract, deploy

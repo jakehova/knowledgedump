@@ -17,6 +17,8 @@ Path of the secret key file: C:\Users\jacob\AppData\Local\Ethereum\keystore\UTC-
   * eth.sendRawTransaction(): sending serialized signed tx. Used when private key is NOT handled by geth. 
 * [Truffle](https://truffleframework.com) - used to develop and test dapps and smart contracts on eth
 * [Drizzle](https://www.trufflesuite.com/drizzle) - React library that live updates a redux store with eth data
+* [Vanity ETH](https://vanity-eth.tk/) - Get a vanity ETH address to use for sending/receiving items during development
+* [Money Legos](https://money-legos.studydefi.com/#/) - 
 
 
 **Setup**
