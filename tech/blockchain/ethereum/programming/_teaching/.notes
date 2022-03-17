@@ -1,0 +1,26 @@
+## Chapter 0: What and How to write programs.
+* definition of compiler
+* psuedo code
+* example problem to build off of (how to walk to fridge)
+
+## Chapter 1: What is blockchain
+* A blockchain is storage mechanism that attempts to be unchangable.  It contains blocks that are tied together in a linear fashion.  Each time a block is created, it is added to the chain using information from the previous block.  This way, if someone tried to change something, they'd have to change every single block before it.  
+* How are transactions made
+* How are blocks made (proof of work vs proof of stake)
+* 
+## Chapter 2: What is Ethereum
+* What are the key components of ethereum (proof of stake, contracts, wallets, transactions)
+* Ethereum is a type of blockchain.
+* Ethereum contract are the fundamental building block of Ethereum applications
+* Ethereum contracts are written in a programming language called Solidity.  
+* What are Ethereum Accounts: 
+    * Think of them lke bank accounts.  Each account has a balance of Ether and you can send Ether to/from accounts.  
+    * Each account has an address; just like  bank account has account #s.  An address looks like: 0x0Fe4535550CBBDF41123C46dcc1Ff0Bb912345
+    * An account can be owned by users or contracts.
+
+## Chapter 3: What is Solidity
+* Setting up a dev environment
+
+## Chapter 4: Seting up a Dev Environment
+
+## Chapter 5: Writing a Solidity contract

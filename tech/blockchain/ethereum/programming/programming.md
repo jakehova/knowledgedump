@@ -8,6 +8,7 @@ Path of the secret key file: C:\Users\jacob\AppData\Local\Ethereum\keystore\UTC-
 - You must BACKUP your key file! Without the key, it's impossible to access account funds!
 - You must REMEMBER your password! Without the password, it's impossible to decrypt the key!
 
+<<<<<<< HEAD
 **Tools**
 * [REMIX](https://remix.ethereum.org/) - online IDE for Eth contracts
 * [Ganache](https://www.trufflesuite.com/ganache) - ETH simulator -> this is not the command line version 
@@ -27,12 +28,8 @@ Path of the secret key file: C:\Users\jacob\AppData\Local\Ethereum\keystore\UTC-
 2) create truffle project
    1) truffle init
    2) update truffle-config.json: 
+=======
+>>>>>>> c9328cea6d23c8a91c9344af84c7f8b7be544622
 
-
-
-3) add .babelrc file with: { "presets": ["es2015", "stage-2", "stage-3"] } 
-4) add .env file (accessed via npm package dotenv)
-5) smoke test by running truffle compile from command line and confirming that ABI is generated for each contract in contracts folder
-6) run truffle migrate to deploy the contracts to the blockchain (defined in truffle-config file)
 
 

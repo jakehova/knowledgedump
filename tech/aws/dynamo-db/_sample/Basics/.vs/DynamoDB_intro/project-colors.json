@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "da7e9cb5-69f0-46c8-a0dd-4966e38fdf5f": {
+      "ProjectGuid": "da7e9cb5-69f0-46c8-a0dd-4966e38fdf5f",
+      "DisplayName": "DynamoDB_intro",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}
