@@ -101,7 +101,7 @@
     Log-->Topic1
     Topic2
     end
-    Consumer-->Topic1
+    Topic1-->Consumer
     subgraph kStream
     Topic1-->JavaApp
     JavaApp-->Topic2
