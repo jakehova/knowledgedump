@@ -118,6 +118,23 @@ for (uint = 1; i< 10; i++) {
 
 ## Structs - used for logical data grouping.  A way to group variables that all describe the same thing.
 ```
+<<<<<<< HEAD
+var Election = artifacts.require("./Election.sol");
+contract("Election", function(accounts){
+    it("initializes with two candidates", function(){
+        return Election.deployed().then(function(instance){
+            return instance.candidatesCount();
+        }).then(function(count){
+            assert.equal(count, 2);
+        })
+    })
+}) ;
+```
+**Deploying a Contract to Local Ganache** 
+* Open Remix and paste in contract, compile it
+* In console run: geth --http --http.corsdomain https://remix.ethereum.org command to start geth connection to remix
+* In Remix, go to publish and select Web3Provider, select contract, deploy
+=======
 struct Person {
     uint age;
     uint heightInCm;
@@ -492,3 +509,4 @@ contract ERC721 {
     uint256 c = b.mul(2); // 3 * 2 = 6
   }
   ```
+>>>>>>> c9328cea6d23c8a91c9344af84c7f8b7be544622

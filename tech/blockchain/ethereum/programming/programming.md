@@ -8,6 +8,28 @@ Path of the secret key file: C:\Users\jacob\AppData\Local\Ethereum\keystore\UTC-
 - You must BACKUP your key file! Without the key, it's impossible to access account funds!
 - You must REMEMBER your password! Without the password, it's impossible to decrypt the key!
 
+<<<<<<< HEAD
+**Tools**
+* [REMIX](https://remix.ethereum.org/) - online IDE for Eth contracts
+* [Ganache](https://www.trufflesuite.com/ganache) - ETH simulator -> this is not the command line version 
+* [Ganache-CLI](https://github.com/trufflesuite/ganache-cli) - ETH simulator that speeds up process of setting up private network and txs are mined immediately
+* [GETH](https://geth.ethereum.org/) (Go Ethereum client)  - used to interact with ETH network
+  * eth.sendTransaction(): send tx obj.  GETH will help signing tx if it has access to private key
+  * eth.sendRawTransaction(): sending serialized signed tx. Used when private key is NOT handled by geth. 
+* [Truffle](https://truffleframework.com) - used to develop and test dapps and smart contracts on eth
+* [Drizzle](https://www.trufflesuite.com/drizzle) - React library that live updates a redux store with eth data
+* [Vanity ETH](https://vanity-eth.tk/) - Get a vanity ETH address to use for sending/receiving items during development
+* [Money Legos](https://money-legos.studydefi.com/#/) - 
+
+
+**Setup**
+1) create front end project; npx create-react-app <appname>
+   1) update package.json with package-example.json 
+2) create truffle project
+   1) truffle init
+   2) update truffle-config.json: 
+=======
+>>>>>>> c9328cea6d23c8a91c9344af84c7f8b7be544622
 
 
 
