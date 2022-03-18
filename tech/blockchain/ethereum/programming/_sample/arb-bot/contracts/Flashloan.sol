@@ -7,9 +7,14 @@ import "@studydefi/money-legos/dydx/contracts/ICallee.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
-contract DydxFlashloaner is ICallee, DydxFlashloanBase {
-    struct MyCustomData {
-        address token;
+contract Flashloan is ICallee, DydxFlashloanBase {
+    enum Direction {
+        KyberToUniswap,
+        UniswapToKyber
+    }
+
+    struct ArbInfo {
+        Direction direction;
         uint256 repayAmount;
     }
 
@@ -20,24 +25,18 @@ contract DydxFlashloaner is ICallee, DydxFlashloanBase {
         Account.Info memory account,
         bytes memory data
     ) public {
-        MyCustomData memory mcd = abi.decode(data, (MyCustomData));
-        uint256 balOfLoanedToken = IERC20(mcd.token).balanceOf(address(this));
+        ArbInfo memory arbInfo = abi.decode(data, (ArbInfo));
 
-        // Note that you can ignore the line below
-        // if your dydx account (this contract in this case)
-        // has deposited at least ~2 Wei of assets into the account
-        // to balance out the collaterization ratio
-        require(
-            balOfLoanedToken >= mcd.repayAmount,
-            "Not enough funds to repay dydx loan!"
-        );
-
-        // TODO: Encode your logic here
-        // E.g. arbitrage, liquidate accounts, etc
-        revert("Hello, you haven't encoded your logic");
+        
     }
 
-    function initiateFlashLoan(address _solo, address _token, uint256 _amount)
+
+    /*
+    _solo -> address of dy/dx
+    _token -> token you want to borrow
+    _amount -> amount you want to borrow
+    */
+    function initiateFlashloan(address _solo, address _token, uint256 _amount, Direction _direction)
         external
     {
         ISoloMargin solo = ISoloMargin(_solo);
@@ -58,7 +57,7 @@ contract DydxFlashloaner is ICallee, DydxFlashloanBase {
         operations[0] = _getWithdrawAction(marketId, _amount);
         operations[1] = _getCallAction(
             // Encode MyCustomData for callFunction
-            abi.encode(MyCustomData({token: _token, repayAmount: repayAmount}))
+            abi.encode(ArbInfo({direction: _direction, repayAmount: repayAmount}))
         );
         operations[2] = _getDepositAction(marketId, repayAmount);
 
