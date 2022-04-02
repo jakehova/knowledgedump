@@ -1,8 +1,5 @@
 # Tensorflow
 
-## What?
-JS and Python library to develop models, train them, and use them to run ML and AI on many platforms.  It is written in C++ 
-
 ## Common Terms
 * Deep Learning results feed better Machine Learning Models.  Better Machine Learning Models feed better AI.
 * AI - Science of making things smart
@@ -27,7 +24,8 @@ JS and Python library to develop models, train them, and use them to run ML and 
     * This works by feeding the Kerans Model the Layers API.  The Core/OPS API then translates the Keras Model to a TensorFlow SavedModel.  
 
 ## What is it
-TensorflowJS - Javascript library that contains Google's machine learning library 
+* JS and Python library to develop models, train them, and use them to run ML and AI on many platforms.  It is written in C++ 
+* TensorflowJS - Javascript library that contains Google's machine learning library 
 * Python vs Javascript  
     * Running Tensorflow in NodeJS allows you to leverage CUDA and AVX acceleration to perform a LOT faster than Python. 
     * NodeJS supports integrating with Python Keras and Tensorflow SavedModels created in Python.  
@@ -43,6 +41,18 @@ TensorflowJS - Javascript library that contains Google's machine learning librar
         * Lower Cost - with no server there is no infrastructure server side to pay for 
         * Interactivity - can directly interact with the library using the browser platform
         * Reach & Scale - Running on a browser is basically omnipresent. 
+
+## Setup
+**Note:** If using typescript, then set "skipLibCheck: true" in tsconfig.json file.
+**Note:** NPM is shipped with ES Modules and ES2017 syntax
+* JS 
+    * npm install @tensorflow/tfjs
+* Node:     
+    * npm install @tensorflow/tfjs-node
+* Linux with CUDA support (NVIDIA GPU)
+    * npm install @tensorflow/tfjs-node-gpu
+* Script tag
+    * <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
 
 ## Structurte
 Models --> Layers API --> Core/OPS API
