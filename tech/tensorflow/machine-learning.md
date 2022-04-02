@@ -40,3 +40,31 @@
     * TensorFlow Lite: Google's ML framework that focuses on mobile native and IoT devices.  **Note:** TensorflowJS can also run on these platforms but TensorFlow Lite is optimized for them.
     * ONNX: The Open Neural Network Exchange is an open-source AI ecosystem of tech companies and research orgs.  ONNX establishes open standards for representing ML algorithms in a way agnostic to the library it was written in. 
 
+## Selecting a Model
+* Understand the problem by asking the client questions: 
+    * What type of app does the customer need
+    * is it a web app? does it need to run on the client-side or the server-side?
+    * how important is privacy, speed, accuracy?
+* Populate the list of models that can be used to solve the problem
+* Use Inference speed (lower the better), file size of the model, RAM in MB to compare models
+    * calc inference speed: 
+    ```
+    async function calculateInferenceSpeed() {
+        //  Record timestamp before model execution
+        const timeStart = performance.now();
+        // Execute model
+        let results = await useSomeModel();
+        // Record timestamp after model execution
+        const timeEnd = performance.now();
+        // Calculate time taken for model execution
+        const timeTaken = timeEnd - timeStart;
+        console.log(`Time taken ${timeTaken} ms.`);
+        // Convert ms to FPS
+        console.log(`Frames per sec: ${1000 / timeTaken}`);
+    }
+    ```
+    * file size: check model's documentation or pull up the model and look at file size on chrome dev tools
+        * models are json or bin files.  add up all the json/bin files that re pulled down and you have your model size
+    * Use memory tab in chrome dev tools 
+        * load the model, go to memory tab, click create snapshot => view total ram in the statistics drop down option 
+    
