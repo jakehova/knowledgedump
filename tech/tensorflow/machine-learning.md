@@ -67,4 +67,6 @@
         * models are json or bin files.  add up all the json/bin files that re pulled down and you have your model size
     * Use memory tab in chrome dev tools 
         * load the model, go to memory tab, click create snapshot => view total ram in the statistics drop down option 
+
+
     
