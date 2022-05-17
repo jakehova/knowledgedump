@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "@compound-finance/compound-js": "^0.2.4",
-    "axios": "^0.21.0"
+    "axios": "^0.21.2"
   }
 }
