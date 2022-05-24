@@ -38,9 +38,18 @@ provider "aws" {
     * terraform.lock.hcl file - this operates to make sure provider library is same version consistently (package.json parallel)
     * .terraform folder    
     * in .terraform folder you will have compiled result 
+* important files: 
+  * **terraform.lock.hcl**
+    * stores the provider attributes so terraform knows what versions of things to use for providers
+    * similar to package.json.lock
 * file types
   * tf: terraform file
   * tpl: template file 
+  * tfvars: takes variables defined in variables.tf file and provides values for them.  This file cannot declare new variables
+  * variables.tf: define variables and, optionally, their default values
+  * main.tf: defines the terraform block
+  * providers.tf: defines the providers 
+  * versions.tf: defines the required versions for items being run
 
 ## Common Commands
 * initialize state: **terraform init**
@@ -50,6 +59,11 @@ provider "aws" {
 * format terraform files: **terraform fmt**
 * get into terraform console: **terraform console**
 * destroy entirety of terraform generated resources: **terraform destroy**
+
+## Debugging
+* Set TF_LOG environment variable to "DEBUG"
+  * Powershell: **$env:TF_LOG="DEBUG"**
+* Confirm the aws role that is running the commands: **aws sts get-caller-identity**
 
 
 ## Resources
@@ -150,6 +164,12 @@ variable "<another variable name>" {
   }
 ```
 
+## Variables
+* **variables.tf** is used to define variable TYPES and, optionally, set default values
+* **<filename>.tfvars** is used to SET the values of those variables and is passed as a command line argument to the apply method
+  * this file cannot create new variables
+
+
 ## [Output](https://www.terraform.io/language/values/outputs)
 * Allows you to output values that are associated with the resources that were deployed from the console
 * Defined outputs are shown in the tfstate file
@@ -160,6 +180,11 @@ output "dev_ip" {
 ```
 
 ## Notes
+* Handling Mismatching
+  * discrepancy between lock file and current terraform configuration
+    * terraform init -upgrade
+  
+  
 * Create a KeyPair: 
 ```
 // from the terminal: 
