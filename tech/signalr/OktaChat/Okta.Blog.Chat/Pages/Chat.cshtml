@@ -1,0 +1,73 @@
+﻿@page
+
+<div id="chatApp">
+  <div class="container">
+    <div class="row">
+      <div class="col-2">Message</div>
+      <div class="col-4">
+        <input type="text" v-model="message" id="message" />
+        <input type="button" v-on:click.stop.prevent="sendMessage" id="sendButton" value="Send Message" />
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <hr />
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6">
+      <ul id="messagesList">
+        <li v-for="(item, index) in chatLog" :key="index">{{ item.User }} - {{ item.Message }}</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aspnet-signalr/1.0.27/signalr.min.js"></script>
+<script src="https://unpkg.com/vue@3.2.24/dist/vue.global.prod.js"></script>
+<script>
+  const connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+
+  const VueChatApp = {
+    data() {
+      return {
+        isConnected: false,
+        message: "",
+        chatLog: [],
+      };
+    },
+    mounted() {
+      connection.on("ReceiveMessage", (user, message) => {
+        this.receiveMessage(user, message);
+      });
+      connection
+        .start()
+        .then(() => {
+          this.isConnected = true;
+        })
+        .catch((err) => {
+          return console.error(err.toString());
+        });
+    },
+    methods: {
+      receiveMessage(user, message) {
+        this.chatLog.push({
+          User: user,
+          Message: message,
+        });
+      },
+      sendMessage() {
+        connection
+          .invoke("SendMessage", this.message)
+          .then(() => {
+            this.message = "";
+          })
+          .catch((err) => {
+            return console.error(err.toString());
+          });
+      },
+    },
+  };
+
+  Vue.createApp(VueChatApp).mount("#chatApp");
+</script>
