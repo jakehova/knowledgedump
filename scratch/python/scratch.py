@@ -1,185 +1,34 @@
-"""This module is used to transfer incoming twilio requests to a Vetext endpoint"""
+from vetext_incoming_forwarder_lambda import vetext_incoming_forwarder_lambda_handler, process_body_from_alb_invocation
+import pytest
+import http
 
-import json
-import http.client
-import ssl
-import os
-import logging
-from urllib.parse import parse_qsl
-from base64 import b64decode
-import boto3
+albInvokeWithAddOn =  {'requestContext': {'elb': {'targetGroupArn': 'arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:171875617347:targetgroup/prod-vetext-incoming-tg/235ef4ac03a4706b'}}, 'httpMethod': 'POST', 'path': '/twoway/vettext', 'queryStringParameters': {}, 'headers': {'accept': '*/*', 'connection': 'close', 'content-length': '574', 'content-type': 'application/x-www-form-urlencoded', 'host': 'api.va.gov', 'i-twilio-idempotency-token': 'edf7e44c-3116-4261-8ef6-e762ca6a4fce', 'user-agent': 'TwilioProxy/1.1', 'x-amzn-trace-id': 'Self=1-62d5ee4d-2cb5b7303f8e994a1f5cb6e1;Root=1-62d5ee4d-24b4119d5098534860221d75', 'x-forwarded-for': '3.89.199.39, 10.239.28.71, 3.89.199.39, 10.247.33.103', 'x-forwarded-host': 'api.va.gov:443', 'x-forwarded-port': '443', 'x-forwarded-proto': 'https', 'x-forwarded-scheme': 'https', 'x-home-region': 'us1', 'x-real-ip': '3.89.199.39', 'x-twilio-signature': 'CRL6vBRyRo0DOLIud+zkNNjHi/Q='}, 'body': 'VG9Db3VudHJ5PVVTJlRvU3RhdGU9JlNtc01lc3NhZ2VTaWQ9U00wOGMwODNhYjY3YjRhNjdkOTYwZWU1ZTM1OTc2MDU5MyZOdW1NZWRpYT0wJlRvQ2l0eT0mRnJvbVppcD02OTE0MyZTbXNTaWQ9U00wOGMwODNhYjY3YjRhNjdkOTYwZWU1ZTM1OTc2MDU5MyZGcm9tU3RhdGU9TkUmU21zU3RhdHVzPXJlY2VpdmVkJkZyb21DaXR5PU5PUlRIK1BMQVRURSZCb2R5PVkxMyZGcm9tQ291bnRyeT1VUyZUbz01MzA3OSZNZXNzYWdpbmdTZXJ2aWNlU2lkPU1HYmU2YmIyN2E5Y2ExNWRlMjc2YzViODZmMGQ5ZTljMmUmVG9aaXA9JkFkZE9ucz0lN0IlMjJzdGF0dXMlMjIlM0ElMjJzdWNjZXNzZnVsJTIyJTJDJTIybWVzc2FnZSUyMiUzQW51bGwlMkMlMjJjb2RlJTIyJTNBbnVsbCUyQyUyMnJlc3VsdHMlMjIlM0ElN0IlN0QlN0QmTnVtU2VnbWVudHM9MSZSZWZlcnJhbE51bU1lZGlhPTAmTWVzc2FnZVNpZD1TTTA4YzA4M2FiNjdiNGE2N2Q5NjBlZTVlMzU5NzYwNTkzJkFjY291bnRTaWQ9QUM1NTFmYzYwODZmOTNhODM0OTI0NjZmYzYwNGM2OGFmNCZGcm9tPSUyQjEzMDg2NjA3NzgyJkFwaVZlcnNpb249MjAxMC0wNC0wMQ==', 'isBase64Encoded': True}
+albInvokedWithoutAddOn = {'requestContext': {'elb': {'targetGroupArn': 'arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:171875617347:targetgroup/prod-vetext-incoming-tg/235ef4ac03a4706b'}}, 'httpMethod': 'POST', 'path': '/twoway/vettext', 'queryStringParameters': {}, 'headers': {'accept': '*/*', 'connection': 'close', 'content-length': '573', 'content-type': 'application/x-www-form-urlencoded', 'host': 'api.va.gov', 'i-twilio-idempotency-token': '62c29575-5ed0-4638-92cb-297c5c8763ea', 'user-agent': 'TwilioProxy/1.1', 'x-amzn-trace-id': 'Self=1-62cda3f5-20dbbea14d3b70cf717c9a77;Root=1-62cda3f5-44e716a47645d83a41a7ee7f', 'x-forwarded-for': '44.202.129.169, 10.237.28.71, 44.202.129.169, 10.247.32.239', 'x-forwarded-host': 'api.va.gov:443', 'x-forwarded-port': '443', 'x-forwarded-proto': 'https', 'x-forwarded-scheme': 'https', 'x-home-region': 'us1', 'x-real-ip': '44.202.129.169', 'x-twilio-signature': 'kvIT2C0P5KgiD+bCkzeUJcaIn4g='}, 'body': 'VG9Db3VudHJ5PVVTJlRvU3RhdGU9JlNtc01lc3NhZ2VTaWQ9U002NDI0Yjc5ZDY3NTlkYjU3MWI0OGUzMTZjYWVmNDlmMyZOdW1NZWRpYT0wJlRvQ2l0eT0mRnJvbVppcD05NjE1MCZTbXNTaWQ9U002NDI0Yjc5ZDY3NTlkYjU3MWI0OGUzMTZjYWVmNDlmMyZGcm9tU3RhdGU9TlYmU21zU3RhdHVzPXJlY2VpdmVkJkZyb21DaXR5PUNBUlNPTitDSVRZJkJvZHk9VkFYJkZyb21Db3VudHJ5PVVTJlRvPTgwNzI4Jk1lc3NhZ2luZ1NlcnZpY2VTaWQ9TUdmZWQ1NjhmMmQzZGM0YWM2ODUwYTBiYWQyYzk4NzNiMSZUb1ppcD0mQWRkT25zPSU3QiUyMnN0YXR1cyUyMiUzQSUyMnN1Y2Nlc3NmdWwlMjIlMkMlMjJtZXNzYWdlJTIyJTNBbnVsbCUyQyUyMmNvZGUlMjIlM0FudWxsJTJDJTIycmVzdWx0cyUyMiUzQSU3QiU3RCU3RCZOdW1TZWdtZW50cz0xJlJlZmVycmFsTnVtTWVkaWE9MCZNZXNzYWdlU2lkPVNNNjQyNGI3OWQ2NzU5ZGI1NzFiNDhlMzE2Y2FlZjQ5ZjMmQWNjb3VudFNpZD1BQzU1MWZjNjA4NmY5M2E4MzQ5MjQ2NmZjNjA0YzY4YWY0JkZyb209JTJCMTc3NTcyMDYwMjAmQXBpVmVyc2lvbj0yMDEwLTA0LTAx', 'isBase64Encoded': True}
+sqsInvokedWithAddOn =  {'Records': [{'messageId': '143555b0-a74b-4793-8421-15cfeeaa487d', 'receiptHandle': 'AQEBfoQLBPET91yTrBH2AEToheRAt2X8vrQddfzr8CG4haD0LT+leMdW7uiDW9AEvr6YMbTVBgYNSBUegTU/g3KQ6deY1NqQxba+2j0KnHiiSrnzuotJAcSItGGjKh2kr4mxU/zg+WMmD1949uCS+og+x9Ayxy0762PtFiQ//vT1fiMVvCXtArDQHnj6p0ywENGq99TE/71UYXPn2WuuQcGgGvEi4kOYzz0u4/iQxH8kWz5u7Qroumob/4EVe7uAu6FCzSYylY+6yCHnDMCtqVKKndr1RP/hUiGkp/Cy8nZew2yh7lJvIIvi9hZjMi8/HQs8725HV1/83hOukYq8IrWIT0tDjDI49Xn/cOjzMGpbRmchr5tk4JOBM8Btg0JkkuM8Js7an5PiuvRS0sqeX1INTZQDCl7nOqNbPjqx0FKgDzg=', 'body': '{"ToCountry": "US", "SmsMessageSid": "SM031265e1d5c5e56c6243509a1eafc7e8", "NumMedia": "0", "FromZip": "74344", "SmsSid": "SM031265e1d5c5e56c6243509a1eafc7e8", "FromState": "OK", "SmsStatus": "received", "FromCity": "GROVE", "Body": "Y1", "FromCountry": "US", "To": "53079", "MessagingServiceSid": "MGbe6bb27a9ca15de276c5b86f0d9e9c2e", "NumSegments": "1", "ReferralNumMedia": "0", "MessageSid": "SM031265e1d5c5e56c6243509a1eafc7e8", "AccountSid": "AC551fc6086f93a83492466fc604c68af4", "From": "+19188015777", "ApiVersion": "2010-04-01"}', 'attributes': {'ApproximateReceiveCount': '1', 'SentTimestamp': '1658165878744', 'SenderId': 'AROASQBEVZJB7JNKLLQIY:project-prod-vetext-incoming-forwarder-lambda', 'ApproximateFirstReceiveTimestamp': '1658245723375'}, 'messageAttributes': {'source': {'stringValue': 'twilio', 'stringListValues': [], 'binaryListValues': [], 'dataType': 'String'}}, 'md5OfMessageAttributes': '54818a2ef8e5363fbdb8d318121ef7c4', 'md5OfBody': '63d3b9430c4741f41a20554ed655db1f', 'eventSource': 'aws:sqs', 'eventSourceARN': 'arn:aws-us-gov:sqs:us-gov-west-1:171875617347:prod-vetext-failed-request-queue', 'awsRegion': 'us-gov-west-1'}]}
 
-logging.getLogger().setLevel(logging.DEBUG)
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+class HttpResponse:
+  def __init__(self, status):
+    self.status = status
 
-def vetext_incoming_forwarder_lambda_handler(event: any, context: any):
-    """this method takes in an event passed in by either an alb or sqs.
-        @param: event   -  contains data pertaining to an incoming sms from Twilio
-        @param: context -  contains information regarding information
-            regarding what triggered the lambda (context.invoked_function_arn).
-    """
+@pytest.fixture
+def http_success_response():
+  return HttpResponse(200)
 
-    try:
-        logger.debug(event)
+@pytest.fixture
+def http_failure_response():
+  return HttpResponse(500)
 
-        # Determine if the invoker of the lambda is SQS or ALB
-        #   SQS will submit batches of records so there is potential for multiple events to be processed
-        #   ALB will submit a single request but to simplify code, it will also return an array of event bodies
-        if "requestContext" in event and "elb" in event["requestContext"]:
-            logger.info("alb invocation")
-            event_bodies = process_body_from_alb_invocation(event)            
-        elif "Records" in event:
-            logger.info("sqs invoication")
-            event_bodies = process_body_from_sqs_invocation(event)
-        else:
-            logger.error("Invalid Event. Expecting the source of an invocation to be from alb or sqs")
+@pytest.mark.parametrize('event', [(albInvokedWithoutAddOn), (albInvokeWithAddOn)])
+def test_verify_parsing_of_twilio_message(event):  
+  response = process_body_from_alb_invocation(event)
+  
+  assert len(response) > 0
+  assert 'AddOns' not in response
 
-            push_to_sqs(event["body"])
-
-            return{
-                'statusCode': 400
-            }
-
-        logger.debug(event_bodies)
-
-        responses = []
-
-        for event_body in event_bodies:            
-            response = make_vetext_request(event_body)
-
-            if response.status != 200:
-                push_to_sqs(event["body"])
-
-            logger.debug(response.read().decode())
-
-            responses.append(response)
-
-        logger.debug(responses)
-        
-        return {
-            'statusCode': 200
-        }
-    except KeyError as e:
-        logger.exception(e)
-        # Place request on SQS for processing after environment variable issue is resolved
-        push_to_sqs(event["body"])
-
-        return {
-            'statusCode': 424
-        }
-    except http.client.HTTPException as e:
-        logger.exception(e)
-        # Place request on SQS for processing after environment variable issue is resolved
-        push_to_sqs(event["body"])
-
-        return{
-            'statusCode':503
-        }
-    except Exception as e:
-        logger.exception(e)        
-        # Place request on dead letter queue so that it can be analyzed 
-        #   for potential processing at a later time
-        push_to_sqs(event["body"])
-
-        return{
-            'statusCode':500
-        }
-
-def process_body_from_sqs_invocation(event):
-    event_bodies = []
-    for record in event["Records"]:
-        # record is a sqs event that contains a body
-        # body is an alb request that failed in an initial request
-        # event is a json document with a body attribute that contains
-        #   the payload of the twilio webhook
-        # event["body"] is a base 64 encoded string
-        # parse_qsl converts url-encoded strings to array of tuple objects
-        # event_body takes the array of tuples and creates a dictionary
-        try:
-            event_body_decoded = parse_qsl(b64decode(record["body"]).decode('utf-8'))
-            event_body = dict(event_body_decoded)
-            event_bodies.append(event_body)
-        except:
-            push_to_sqs(record["body"])
-
-    return event_bodies
-
-def process_body_from_alb_invocation(event):
-    event_bodies = []
-
-    # event is a json document with a body attribute that contains
-    #   the payload of the twilio webhook
-    # event["body"] is a base 64 encoded string
-    # parse_qsl converts url-encoded strings to array of tuple objects
-    # event_body takes the array of tuples and creates a dictionary
-    event_body_decoded = parse_qsl(b64decode(event["body"]).decode('utf-8'))
-    event_bodies.append(dict(event_body_decoded))
-
-    return event_bodies
-    
-
-def read_from_ssm(key: str) -> str:
-    ssm_client = boto3.client('ssm')
-    
-    response = ssm_client.get_parameter(
-        Name=key,
-        WithDecryption=True
-    )
-
-    logger.info(response)
-
-    return response.get("Parameter", {}).get("Value", '')
-
-def make_vetext_request(request_body):    
-    connection = http.client.HTTPSConnection(os.environ.get('vetext_api_endpoint_domain'),  context = ssl._create_unverified_context())
-
-    # Authorization is basic token authentication that is stored in environment.
-    authToken = read_from_ssm(os.environ.get('vetext_api_auth_ssm_path'))
-
-    logger.info(f'ssm key: {authToken}')
-
-    headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'Basic ' + authToken
-    }
-
-    body = {
-            "accountSid": request_body.get("AccountSid", ""),
-            "messageSid": request_body.get("MessageSid", ""),
-            "messagingServiceSid": "",
-            "to": request_body.get("To", ""),
-            "from": request_body.get("From", ""),
-            "messageStatus": request_body.get("SmsStatus", ""),
-            "body": request_body.get("Body", "")
-        }
-
-    json_data = json.dumps(body)
-
-    connection.request(
-        'POST',
-        os.environ.get('vetext_api_endpoint_path'),
-        json_data,
-        headers)
-
-    response = connection.getresponse()
-
-    return response    
-
-def push_to_sqs(event):
-    """Places event on queue to be retried at a later time"""
-    sqs = boto3.client('sqs')
-    queue_url = os.environ.get('vetext_request_drop_sqs_url')
-
-    queue_msg = json.dumps(event)
-    queue_msg_attrs = {
-        'source': {
-            'DataType': 'String',
-            'StringValue': 'twilio'
-        }
-    }
-
-    sqs.send_message(QueueUrl=queue_url,
-                    MessageAttributes=queue_msg_attrs,
-                    MessageBody=queue_msg)
-    
+@pytest.mark.parametrize('event', [(albInvokedWithoutAddOn), (albInvokeWithAddOn), (sqsInvokedWithAddOn)])
+def test_request_makes_vetext_call(mocker, http_success_response, event):
+  vetext_mock = mocker.patch('vetext_incoming_forwarder_lambda.make_vetext_request', return_value=http_success_response)
+  response = vetext_incoming_forwarder_lambda_handler(event, None)
+  
+  vetext_mock.assert_called_once()
+  assert response['statusCode'] == 200
