@@ -15,6 +15,8 @@
   * express
 * Add Application
   * nx g @nrwl/<platform> <project name>
+  * OR nx g app 
+    * this is how to create an app by following prompts
 * Add Library
   * nx g @nrwl/<platform>:lib <library name>
     * To create a standard typescript library: platform is node
