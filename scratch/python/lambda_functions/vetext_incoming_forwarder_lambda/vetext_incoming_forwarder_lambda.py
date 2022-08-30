@@ -1,7 +1,7 @@
 """This module is used to transfer incoming twilio requests to a Vetext endpoint"""
 
 import json
-import http.client
+import requests
 import ssl
 import os
 import logging
@@ -11,6 +11,9 @@ import boto3
 
 logger = logging.getLogger("vetext_incoming_forwarder_lambda")
 logger.setLevel(logging.DEBUG)
+
+# http timeout for calling vetext endpoint
+HTTPTIMEOUT = 6
 
 
 def vetext_incoming_forwarder_lambda_handler(event: dict, context: any):
@@ -36,12 +39,10 @@ def vetext_incoming_forwarder_lambda_handler(event: dict, context: any):
             logger.debug(event)
             push_to_dead_letter_sqs(event, "vetext_incoming_forwarder_lambda_handler")
 
-            return create_twilio_response(200)
+            return create_twilio_response(400)
 
         logger.info("Successfully processed event to event_bodies")
         logger.debug(event_bodies)
-
-        responses = []
 
         for event_body in event_bodies:
             logger.debug(f"Processing event_body: {event_body}")
@@ -51,17 +52,13 @@ def vetext_incoming_forwarder_lambda_handler(event: dict, context: any):
             if response is None:
                 push_to_retry_sqs(event_body)
 
-            responses.append(response)
-
-        logger.debug(responses)
-
         return create_twilio_response(200)
     except Exception as e:
         logger.error(event)
         logger.exception(e)
         push_to_dead_letter_sqs(event, "vetext_incoming_forwarder_lambda_handler")
 
-        return create_twilio_response(200)
+        return create_twilio_response(500)
 
 
 def create_twilio_response(status_code):
@@ -143,14 +140,10 @@ def read_from_ssm(key: str) -> str:
     try:
         ssm_client = boto3.client('ssm')
 
-        logger.info("Generated ssm_client")
-
         response = ssm_client.get_parameter(
             Name=key,
             WithDecryption=True
         )
-
-        logger.info("received ssm parameter")
 
         return response.get("Parameter", {}).get("Value", '')
     except Exception as e:
@@ -202,43 +195,39 @@ def make_vetext_request(request_body):
         "body": request_body.get("Body", "")
     }
 
-    json_data = json.dumps(body)
+    endpoint_uri = f"https://{domain}{path}"
 
-    logger.info(f"Making POST Request to VeText using: ${domain}${path}")
-    logger.debug(f"json dumps: {json_data}")
-
-    connection = None
+    logger.info(f"Making POST Request to VeText using: {endpoint_uri}")
+    logger.debug(f"json dumps: {json.dumps(body)}")
 
     try:
-        connection = http.client.HTTPSConnection(domain, timeout=6, context=ssl._create_unverified_context())
-        logger.info("generated connection to VeText")
-
-        connection.request(
-            'POST',
-            path,
-            json_data,
-            headers)
-
-        response = connection.getresponse()
-
-        logger.info(f"VeText call complete with response: {response.status}")
-        logger.debug(f"VeText response: {response}")
-
-        if response.status == 200:
-            return response
-
-        logger.error("VeText call failed.")
-    except http.client.HTTPException as e:
-        logger.error("HttpException With Call To VeText")
+        # setting verify to false at the direction of VeText
+        response = requests.post(
+            endpoint_uri,
+            verify=False,
+            json=body,
+            timeout=HTTPTIMEOUT,
+            headers=headers
+        )
+        response.raise_for_status()
+        
+        response_content = response.content
+        
+        logger.info(f'VeText call complete with response: { response.status_code }')
+        logger.debug(f"VeText response: {response_content}")
+    except requests.HTTPError as e:
+        logger.error("HTTPError With Call To VeText")
+        logger.exception(e)
+    except requests.RequestException as e:
+        logger.error("RequestException With Call To VeText")
         logger.exception(e)
     except Exception as e:
         logger.error("General Exception With Call to VeText")
         logger.exception(e)
-    finally:
-        if connection:
-            connection.close()
 
-    return None
+    return_value = response if response.status_code == 200 else None
+
+    return return_value
 
 
 def push_to_retry_sqs(event_body):
