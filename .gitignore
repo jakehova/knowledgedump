@@ -7,3 +7,5 @@ obj
 *.exe
 
 __pycache__
+
+scratch
