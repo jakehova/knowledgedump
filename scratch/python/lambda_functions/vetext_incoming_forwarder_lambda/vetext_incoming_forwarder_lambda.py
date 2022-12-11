@@ -2,18 +2,18 @@
 
 import json
 import requests
-import ssl
 import os
 import logging
 from urllib.parse import parse_qsl
 from base64 import b64decode
+from functools import lru_cache
 import boto3
 
 logger = logging.getLogger("vetext_incoming_forwarder_lambda")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 # http timeout for calling vetext endpoint
-HTTPTIMEOUT = 6
+HTTPTIMEOUT = (3.05, 1)
 
 
 def vetext_incoming_forwarder_lambda_handler(event: dict, context: any):
@@ -39,7 +39,7 @@ def vetext_incoming_forwarder_lambda_handler(event: dict, context: any):
             logger.debug(event)
             push_to_dead_letter_sqs(event, "vetext_incoming_forwarder_lambda_handler")
 
-            return create_twilio_response(400)
+            return create_twilio_response(500)
 
         logger.info("Successfully processed event to event_bodies")
         logger.debug(event_bodies)
@@ -52,7 +52,7 @@ def vetext_incoming_forwarder_lambda_handler(event: dict, context: any):
             if response is None:
                 push_to_retry_sqs(event_body)
 
-        return create_twilio_response(200)
+        return create_twilio_response()
     except Exception as e:
         logger.error(event)
         logger.exception(e)
@@ -61,7 +61,7 @@ def vetext_incoming_forwarder_lambda_handler(event: dict, context: any):
         return create_twilio_response(500)
 
 
-def create_twilio_response(status_code):
+def create_twilio_response(status_code: int = 200):
     twiml_response = '<?xml version="1.0" encoding="UTF-8"?><Response></Response>'
 
     response = {
@@ -135,15 +135,19 @@ def process_body_from_alb_invocation(event):
 
     return [event_body]
 
-
+@lru_cache(maxsize=None)
 def read_from_ssm(key: str) -> str:
     try:
         ssm_client = boto3.client('ssm')
+
+        logger.info("Generated ssm_client")
 
         response = ssm_client.get_parameter(
             Name=key,
             WithDecryption=True
         )
+
+        logger.info("received ssm parameter")
 
         return response.get("Parameter", {}).get("Value", '')
     except Exception as e:
@@ -153,9 +157,6 @@ def read_from_ssm(key: str) -> str:
 
 
 def make_vetext_request(request_body):
-    # We have been directed by the VeText team to ignore SSL validation
-    #   that is why we use the ssl._create_unverified_context method
-
     ssm_path = os.getenv('vetext_api_auth_ssm_path')
     if ssm_path is None:
         logger.error("Unable to retrieve vetext_api_auth_ssm_path from env variables")
@@ -200,8 +201,7 @@ def make_vetext_request(request_body):
     logger.info(f"Making POST Request to VeText using: {endpoint_uri}")
     logger.debug(f"json dumps: {json.dumps(body)}")
 
-    try:
-        # setting verify to false at the direction of VeText
+    try:        
         response = requests.post(
             endpoint_uri,
             verify=False,
@@ -209,12 +209,12 @@ def make_vetext_request(request_body):
             timeout=HTTPTIMEOUT,
             headers=headers
         )
+        logger.info('VeText POST complete')
         response.raise_for_status()
         
-        response_content = response.content
-        
         logger.info(f'VeText call complete with response: { response.status_code }')
-        logger.debug(f"VeText response: {response_content}")
+        logger.debug(f"VeText response: {response.content}")
+        return response.content
     except requests.HTTPError as e:
         logger.error("HTTPError With Call To VeText")
         logger.exception(e)
@@ -224,10 +224,8 @@ def make_vetext_request(request_body):
     except Exception as e:
         logger.error("General Exception With Call to VeText")
         logger.exception(e)
-
-    return_value = response if response.status_code == 200 else None
-
-    return return_value
+    
+    return None
 
 
 def push_to_retry_sqs(event_body):
