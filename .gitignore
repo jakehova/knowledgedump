@@ -3,3 +3,10 @@ bin
 obj
 
 .env
+
+*.exe
+
+__pycache__
+
+scratch
+.terraform
