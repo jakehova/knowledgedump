@@ -32,7 +32,37 @@ provider "aws" {
 }
 ```
 
-### Setup Initial terraform entry
+### Workspaces
+Terraform has a concept of workspaces that can keep deployments tracked to specific environments.
+
+* Core Commands
+```
+terraform workspace new <workspace name>	-> creates and switches to the newly created workspace
+terraform workspace select <workspace name>	-> switches to the workspace
+terraform workspace list	-> lists workspaces and highlights the active one
+```
+
+* When you create a new workspace, run a terraform init with a backend config:
+```
+terraform init  -backend-config=".\staging-backend.hcl"
+```
+
+* Example backend hcl file: 
+```
+bucket = "bucket to store applied terraform plans"
+region = "aws region to default to"
+role_arn = "aws role that terraform should assume"
+```
+
+* Deployment Commands
+```
+* terraform workspace select staging
+* $timestamp = Get-Date -Format o | ForEach-Object { $_ -replace ":", "." }
+* terraform plan -var-file="..\_staging.tfvars" -out=".\_plans\application-staging-${timestamp}.tfplan"
+* terraform apply ".\_plans\application-staging-${timestamp}.tfplan"
+```
+
+### Setup
 * Run: terraform init
   * this creates:    
     * terraform.lock.hcl file - this operates to make sure provider library is same version consistently (package.json parallel)
@@ -42,14 +72,16 @@ provider "aws" {
   * **terraform.lock.hcl**
     * stores the provider attributes so terraform knows what versions of things to use for providers
     * similar to package.json.lock
-* file types
-  * tf: terraform file
-  * tpl: template file 
-  * tfvars: takes variables defined in variables.tf file and provides values for them.  This file cannot declare new variables
-  * variables.tf: define variables and, optionally, their default values
-  * main.tf: defines the terraform block
-  * providers.tf: defines the providers 
-  * versions.tf: defines the required versions for items being run
+* **Important File Information**
+| File | Description | 
+| --- | --- |
+| .tf | terraform file|
+| .tpl | template file |
+| .tfvars | takes variables defined in variables.tf file and provides values for them.  This file cannot declare new variables|
+| variables.tf | define variables and, optionally, their default values|
+| main.tf | defines the terraform block|
+| providers.tf | defines the providers |
+| versions.tf | defines the required versions for items being run |
 
 ## Common Commands
 * initialize state: **terraform init**

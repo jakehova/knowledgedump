@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {
   "editor.minimap.enabled": false,
   "editor.wrappingIndent": "indent",
@@ -6,7 +5,11 @@
   "editor.lineHeight": 24,
   "workbench.colorTheme": "Material Theme Darker",
   "[markdown]": {
-    "editor.quickSuggestions": true
+    "editor.quickSuggestions": {
+      "comments": "on",
+      "strings": "on",
+      "other": "on"
+    }
   },
   "git.enableSmartCommit": true,
   "git.postCommitCommand": "sync",
@@ -36,50 +39,8 @@
     "titleBar.inactiveForeground": "#e7e7e799",
     "sash.hoverBorder": "#ef7a33",
     "statusBarItem.remoteBackground": "#de5e11",
-    "statusBarItem.remoteForeground": "#e7e7e7"
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "commandCenter.border": "#e7e7e799"
   },
   "peacock.color": "#de5e11"
 }
-=======
-{
-  "editor.minimap.enabled": false,
-  "editor.wrappingIndent": "indent",
-  "editor.overviewRulerBorder": false,
-  "editor.lineHeight": 24,
-  "workbench.colorTheme": "Material Theme Darker",
-  "[markdown]": {
-    "editor.quickSuggestions": true
-  },
-  "git.enableSmartCommit": true,
-  "git.postCommitCommand": "sync",
-  "files.defaultLanguage": "markdown",
-  "files.exclude": {
-    "**/node_modules": true
-  },
-  "files.watcherExclude": {
-    "**/node_modules": true
-  },
-  "vscodeMarkdownNotes.noteCompletionConvention": "noExtension",
-  "vscodeMarkdownNotes.slugifyMethod": "github-slugger",
-  "workbench.colorCustomizations": {
-    "activityBar.activeBackground": "#ef7a33",
-    "activityBar.activeBorder": "#097632",
-    "activityBar.background": "#ef7a33",
-    "activityBar.foreground": "#15202b",
-    "activityBar.inactiveForeground": "#15202b99",
-    "activityBarBadge.background": "#097632",
-    "activityBarBadge.foreground": "#e7e7e7",
-    "statusBar.background": "#de5e11",
-    "statusBar.foreground": "#e7e7e7",
-    "statusBarItem.hoverBackground": "#ef7a33",
-    "titleBar.activeBackground": "#de5e11",
-    "titleBar.activeForeground": "#e7e7e7",
-    "titleBar.inactiveBackground": "#de5e1199",
-    "titleBar.inactiveForeground": "#e7e7e799",
-    "sash.hoverBorder": "#ef7a33",
-    "statusBarItem.remoteBackground": "#de5e11",
-    "statusBarItem.remoteForeground": "#e7e7e7"
-  },
-  "peacock.color": "#de5e11"
-}
->>>>>>> 48a2886636998641ecc02157c451de672f2cf906
