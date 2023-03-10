@@ -55,3 +55,6 @@ $$J(w,b) = 1/(2m) * \displaystyle\sum_{i=1}^m((y-hat^i - y^i)^2)$$
 
 ## Classification 
 Predicts categories. small number of ouptputs.
+
+
+Grade & Dissent

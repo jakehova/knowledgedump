@@ -42,5 +42,6 @@
     "statusBarItem.remoteForeground": "#e7e7e7",
     "commandCenter.border": "#e7e7e799"
   },
-  "peacock.color": "#de5e11"
+  "peacock.color": "#de5e11",
+  "python.formatting.provider": "black"
 }
