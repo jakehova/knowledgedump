@@ -50,3 +50,11 @@
 
 ## Development
 * python tools (pip install -qU): langchain openai tiktoken pinecone-client[grpc] datasets apache_beam 
+
+
+## Steps to make a good chat gpt
+1) Preprocess knowledge base
+   1) 
+2) store it as embeddings
+3) inject context in gpt 3 (text-davinci-3)
+   1) search for most relevant info that relates to query 
