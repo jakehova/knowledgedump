@@ -11,7 +11,10 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 # pip install chromadb - used to store vector embeddings
 from langchain.vectorstores import Chroma
-
+# used to search vector embeddings
+from langchain import HuggingFacePipeline
+# used to query vector embeddings for answer to a question
+from langchain.chains import RetrievalQA
 
 DATA_DIRECTORY = './data'
 VECTOR_DB_PERSIST_DIRECTORY = "vector_db"
@@ -72,18 +75,26 @@ def set_vector_db(tokenzied_documents, embeddings):
     vectordb.persist()
     vectordb = None
 
+def generate_embeddings():
+    tokenzied_documents = tokenize_html_files()
+    embeddings = get_embeddings()
+    set_vector_db(tokenzied_documents, embeddings)
+
 def get_vector_db(embeddings):
     vectordb = Chroma(persist_directory=VECTOR_DB_PERSIST_DIRECTORY, embedding_function=embeddings)
      
+    return vectordb
 
-
-tokenzied_documents = tokenize_html_files()
 embeddings = get_embeddings()
+vector_db = get_vector_db(embeddings)
 
-set_vector_db(tokenzied_documents, embeddings)
-get_vector_db(embeddings)
+llm = HuggingFacePipeline.from_model_id(
+    model_id=TRAINING_MODEL,
+    task="text-generation",
+    model_kwargs={"temperature": 0, "max_new_tokens": 500})
 
+doc_retriever = vector_db.as_retriever()
 
+shakespeare_qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=doc_retriever)
 
-
-
+shakespeare_qa.run("Who was Hamlet's Mother?")
