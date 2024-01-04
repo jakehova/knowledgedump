@@ -1,0 +1,17 @@
+{
+  "name": "hello-world",
+  "version": "1.0.0",
+  "description": "My first application using the Neurosity SDK",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["neurosity"],
+  "author": "Hans Berger",
+  "license": "MIT",
+  "dependencies": {
+    "@neurosity/sdk": "^6.5.7",
+    "dotenv": "^16.3.1"
+  }
+}

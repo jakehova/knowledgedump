@@ -16,9 +16,12 @@ from langchain import HuggingFacePipeline
 # used to query vector embeddings for answer to a question
 from langchain.chains import RetrievalQA
 
+from transformers import pipeline
+
 DATA_DIRECTORY = './data'
 VECTOR_DB_PERSIST_DIRECTORY = "vector_db"
 TRAINING_MODEL = "bigscience/bloomz-1b7"
+
 
 def collect_all_hmtl_docs():
     files = glob("./shakespeare/**/*.html")
@@ -48,6 +51,7 @@ def load_html_text_from_files():
 
     return data
 
+
 def tokenize_using_bloom(data):
     bloomz_tokenizer = AutoTokenizer.from_pretrained(TRAINING_MODEL)
 
@@ -57,6 +61,7 @@ def tokenize_using_bloom(data):
 
     return documents
 
+
 def tokenize_html_files():
     html_file_data = load_html_text_from_files()
 
@@ -64,10 +69,18 @@ def tokenize_html_files():
 
     return tokenzied_documents
 
+
 def get_embeddings():    
     embeddings = HuggingFaceEmbeddings()
 
     return embeddings
+
+
+def generate_embeddings():
+    tokenzied_documents = tokenize_html_files()
+    embeddings = get_embeddings()
+    set_vector_db(tokenzied_documents, embeddings)
+
 
 def set_vector_db(tokenzied_documents, embeddings):
     vectordb = Chroma.from_documents(documents=tokenzied_documents, embedding=embeddings, persist_directory=VECTOR_DB_PERSIST_DIRECTORY)
@@ -75,26 +88,27 @@ def set_vector_db(tokenzied_documents, embeddings):
     vectordb.persist()
     vectordb = None
 
-def generate_embeddings():
-    tokenzied_documents = tokenize_html_files()
-    embeddings = get_embeddings()
-    set_vector_db(tokenzied_documents, embeddings)
 
 def get_vector_db(embeddings):
     vectordb = Chroma(persist_directory=VECTOR_DB_PERSIST_DIRECTORY, embedding_function=embeddings)
      
     return vectordb
 
-embeddings = get_embeddings()
-vector_db = get_vector_db(embeddings)
 
-llm = HuggingFacePipeline.from_model_id(
-    model_id=TRAINING_MODEL,
-    task="text-generation",
-    model_kwargs={"temperature": 0, "max_new_tokens": 500})
+#embeddings = get_embeddings()
+# vector_db = get_vector_db(embeddings)
 
-doc_retriever = vector_db.as_retriever()
+#llm = HuggingFacePipeline.from_model_id(
+#    model_id=TRAINING_MODEL,
+#    task="text-generation",
+#    model_kwargs={"temperature": 0, "max_length": 500})
 
-shakespeare_qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=doc_retriever)
+#doc_retriever = vector_db.as_retriever()
 
-shakespeare_qa.run("Who was Hamlet's Mother?")
+#shakespeare_qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=doc_retriever)
+
+#shakespeare_qa.run("Who was Hamlet's Mother?")
+
+generator = pipeline("text-generation", model=TRAINING_MODEL, tokenizer=TRAINING_MODEL)
+
+result = generator("Who was Hamlet's Mother?", max_length=500, temperature=0)

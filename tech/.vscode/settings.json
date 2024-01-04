@@ -1,0 +1,3 @@
+{
+    "dotnet.defaultSolution": "aws\\dynamo-db\\_sample\\Basics\\DynamoDB_intro.sln"
+}
